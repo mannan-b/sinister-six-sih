@@ -24,7 +24,11 @@ class OpenAIProvider(BaseLLMProvider):
         self.api_key = api_key
         try:
             from openai import OpenAI
-            self.client = OpenAI(api_key=api_key)
+            base_url = getattr(settings, "OPENAI_BASE_URL", None)
+            if base_url:
+                self.client = OpenAI(api_key=api_key, base_url=base_url)
+            else:
+                self.client = OpenAI(api_key=api_key)
         except Exception as e:
             logger.warning(f"Failed to initialize OpenAI client: {e}")
             self.client = None
@@ -39,7 +43,7 @@ class OpenAIProvider(BaseLLMProvider):
             messages.append({"role": "user", "content": prompt})
             
             resp = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="groq/compound-mini",
                 messages=messages,
                 temperature=0.2
             )
@@ -55,7 +59,7 @@ class GeminiProvider(BaseLLMProvider):
     def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         try:
             import httpx
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
             payload = {
                 "contents": [{
                     "parts": [{"text": f"{system_prompt}\n\n{prompt}" if system_prompt else prompt}]

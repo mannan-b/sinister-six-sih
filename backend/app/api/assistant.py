@@ -11,5 +11,5 @@ router = APIRouter(prefix="/assistant", tags=["AI Assistant"])
 def query_assistant(req: AssistantQueryRequest, db: Session = Depends(get_db)):
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
-    response = investigation_assistant.process_query(db, req.case_id, req.query)
+    response = investigation_assistant.process_query(db, req.case_id, req.query, req.context, history=req.history)
     return ApiResponse(success=True, data=response)

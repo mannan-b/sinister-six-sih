@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     # AI LLM Provider Configuration
     LLM_PROVIDER: str = "local"  # local | openai | gemini | anthropic
     OPENAI_API_KEY: str = ""
+    OPENAI_BASE_URL: str = ""
     GEMINI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
     
