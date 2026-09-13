@@ -109,12 +109,17 @@ export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
       timestamp: new Date(),
     };
 
+    const historyPayload = messages.map((m) => ({
+      role: m.role,
+      content: m.text,
+    }));
+
     setMessages((prev) => [...prev, userMsg]);
     setInputQuery("");
     setLoading(true);
 
     try {
-      const res = await askAssistant(caseId, q, context);
+      const res = await askAssistant(caseId, q, context, historyPayload);
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
