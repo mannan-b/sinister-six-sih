@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import engine, Base, ensure_schema_compatibility
 from app.core.logging import logger
 from app.api.cases import router as cases_router
 from app.api.entities import router as entities_router
@@ -17,6 +17,7 @@ from app.api.analysis import router as analysis_router
 
 # Create Database tables
 Base.metadata.create_all(bind=engine)
+ensure_schema_compatibility()
 
 app = FastAPI(
     title="NEXUS API",

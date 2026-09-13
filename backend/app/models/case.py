@@ -15,7 +15,11 @@ class Case(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Metadata for additional tags, investigator info, etc.
+    # Metadata & Core Investigation Attributes
+    fir_number = Column(String(100), nullable=True, index=True)
+    police_station = Column(String(255), nullable=True)
+    investigating_officer = Column(String(255), nullable=True)
+    officer_rank = Column(String(100), nullable=True)
     meta_info = Column(JSON, default=dict)
 
     # Relationships

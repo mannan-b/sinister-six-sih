@@ -5,7 +5,7 @@ from app.ai.investigation_assistant import investigation_assistant
 
 def test_assistant_query_execution():
     db = SessionLocal()
-    case = db.query(Case).filter(Case.case_number == "CAS-2026-NEXUS").first()
+    case = db.query(Case).filter((Case.name == "Operation Nexus") | (Case.case_number.in_(["FIR-1023/2026", "CAS-2026-NEXUS"]))).first()
     if case:
         res = investigation_assistant.process_query(
             db=db,
@@ -20,7 +20,7 @@ def test_assistant_query_execution():
 
 def test_assistant_bridge_query():
     db = SessionLocal()
-    case = db.query(Case).filter(Case.case_number == "CAS-2026-NEXUS").first()
+    case = db.query(Case).filter((Case.name == "Operation Nexus") | (Case.case_number.in_(["FIR-1023/2026", "CAS-2026-NEXUS"]))).first()
     if case:
         res = investigation_assistant.process_query(
             db=db,

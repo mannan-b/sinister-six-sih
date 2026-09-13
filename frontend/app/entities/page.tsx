@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Users, Search, Filter, ArrowRight, Eye } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Users, Search, Filter, ArrowRight, Eye, UploadCloud } from "lucide-react";
 import { fetchCases } from "@/lib/api/cases";
 import { fetchEntities } from "@/lib/api/entities";
 import { EntityBadge } from "@/components/common/EntityBadge";
@@ -14,7 +14,10 @@ import { Entity } from "@/types";
 
 export default function EntitiesPage() {
   const router = useRouter();
-  const [caseId, setCaseId] = useState<string>("");
+  const params = useParams();
+  const routeCaseId = params?.caseId as string | undefined;
+
+  const [caseId, setCaseId] = useState<string>(routeCaseId || "");
   const [entities, setEntities] = useState<Entity[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("ALL");
@@ -23,18 +26,20 @@ export default function EntitiesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!caseId) {
+    if (!caseId && !routeCaseId) {
       fetchCases().then((cases) => {
         if (cases.length > 0) setCaseId(cases[0].id);
       });
     }
-  }, [caseId]);
+  }, [caseId, routeCaseId]);
+
+  const activeCaseId = routeCaseId || caseId;
 
   useEffect(() => {
-    if (!caseId) return;
+    if (!activeCaseId) return;
     setLoading(true);
     fetchEntities({
-      case_id: caseId,
+      case_id: activeCaseId,
       type: typeFilter !== "ALL" ? typeFilter : undefined,
       min_risk: minRisk > 0 ? minRisk : undefined,
       search: search.trim() || undefined,
@@ -43,7 +48,7 @@ export default function EntitiesPage() {
       .then((data) => setEntities(data))
       .catch(() => setEntities([]))
       .finally(() => setLoading(false));
-  }, [caseId, typeFilter, minRisk, search]);
+  }, [activeCaseId, typeFilter, minRisk, search]);
 
   return (
     <div className="space-y-4 font-mono select-none">
@@ -60,7 +65,8 @@ export default function EntitiesPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {/* Search Input */}
             <div className="relative w-48">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
               <input
@@ -68,30 +74,32 @@ export default function EntitiesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Filter entities..."
-                className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border text-xs text-white placeholder:text-slate-500"
+                className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-white"
               />
             </div>
 
+            {/* Entity Type Filter */}
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded bg-surface-raised border border-border text-xs text-slate-200"
+              className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
             >
               <option value="ALL">All Types</option>
               <option value="PERSON">Persons</option>
               <option value="PHONE">Phones</option>
               <option value="VEHICLE">Vehicles</option>
-              <option value="LOCATION">Locations</option>
               <option value="BANK_ACCOUNT">Bank Accounts</option>
-              <option value="ORGANIZATION">Organizations</option>
+              <option value="LOCATION">Locations</option>
             </select>
 
+            {/* Risk Threshold */}
             <select
               value={minRisk}
               onChange={(e) => setMinRisk(Number(e.target.value))}
-              className="px-2.5 py-1.5 rounded bg-surface-raised border border-border text-xs text-slate-200"
+              className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
             >
               <option value="0">All Risk Levels</option>
+              <option value="40">Moderate (&gt;= 40)</option>
               <option value="60">High & Critical (&gt;= 60)</option>
               <option value="80">Critical Only (&gt;= 80)</option>
             </select>
@@ -106,7 +114,20 @@ export default function EntitiesPage() {
             </div>
           ) : entities.length === 0 ? (
             <div className="p-8">
-              <EmptyState title="No Entities Found" description="No entities match the active search query or risk filter." />
+              <EmptyState
+                title="No Entities Found"
+                description={
+                  search
+                    ? "No entities match the active search query or risk filter."
+                    : "Upload an investigation source to begin extracting entities for this case."
+                }
+                actionLabel={search ? undefined : "Upload Case Sources"}
+                onAction={
+                  search
+                    ? undefined
+                    : () => router.push(activeCaseId ? `/cases/${activeCaseId}/sources` : "/sources")
+                }
+              />
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -145,24 +166,27 @@ export default function EntitiesPage() {
                       <td className="px-4 py-3">
                         <RiskBadge level={entity.risk_level} score={entity.risk_score} />
                       </td>
-                      <td className="px-4 py-3 text-slate-300">
-                        {entity.betweenness_centrality?.toFixed(3) || "0.000"}
+                      <td className="px-4 py-3 text-slate-400 text-[11px]">
+                        {entity.betweenness_centrality?.toFixed(4) || "0.0000"}
                       </td>
-                      <td className="px-4 py-3 text-slate-300">
-                        {entity.pagerank_score?.toFixed(3) || "0.000"}
+                      <td className="px-4 py-3 text-slate-400 text-[11px]">
+                        {entity.pagerank_score?.toFixed(4) || "0.0000"}
                       </td>
-                      <td className="px-4 py-3 text-nexus-300 font-semibold">
-                        Cluster {entity.community_id || 0}
+                      <td className="px-4 py-3">
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">
+                          Cluster {entity.community_id || 0}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/explorer?highlight=${entity.id}`);
+                            setSelectedEntityId(entity.id);
                           }}
-                          className="px-2.5 py-1 rounded bg-surface-raised hover:bg-surface-hover border border-border text-[10px] text-nexus-300 hover:text-white transition-colors"
+                          className="p-1 rounded hover:bg-surface-raised text-slate-400 hover:text-nexus-300 transition-colors"
+                          title="View Entity Profile"
                         >
-                          View Graph
+                          <Eye className="w-3.5 h-3.5" />
                         </button>
                       </td>
                     </tr>

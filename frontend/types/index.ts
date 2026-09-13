@@ -30,9 +30,13 @@ export interface ApiResponse<T> {
 export interface Case {
   id: string;
   case_number: string;
+  fir_number?: string;
   name: string;
-  description: string;
-  status: string;
+  description?: string;
+  police_station?: string;
+  investigating_officer?: string;
+  officer_rank?: string;
+  status: "ACTIVE" | "CLOSED" | string;
   created_at: string;
   updated_at: string;
   entity_count: number;

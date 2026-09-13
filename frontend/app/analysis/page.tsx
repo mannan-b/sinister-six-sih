@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { Activity, RefreshCw, CheckCircle2, Play } from "lucide-react";
 import { fetchCases } from "@/lib/api/cases";
 import { fetchAnalysisRuns, triggerPipelineAnalysis } from "@/lib/api/analysis";
@@ -8,36 +9,41 @@ import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { AnalysisRun } from "@/types";
 
 export default function AnalysisPage() {
-  const [caseId, setCaseId] = useState<string>("");
+  const params = useParams();
+  const routeCaseId = params?.caseId as string | undefined;
+
+  const [caseId, setCaseId] = useState<string>(routeCaseId || "");
   const [runs, setRuns] = useState<AnalysisRun[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!caseId) {
+    if (!caseId && !routeCaseId) {
       fetchCases().then((cases) => {
         if (cases.length > 0) setCaseId(cases[0].id);
       });
     }
-  }, [caseId]);
+  }, [caseId, routeCaseId]);
+
+  const activeCaseId = routeCaseId || caseId;
 
   const loadRuns = () => {
-    if (!caseId) return;
-    fetchAnalysisRuns(caseId)
+    if (!activeCaseId) return;
+    fetchAnalysisRuns(activeCaseId)
       .then((data) => setRuns(data))
       .catch(() => {});
   };
 
   useEffect(() => {
     loadRuns();
-  }, [caseId]);
+  }, [activeCaseId]);
 
   const handleRunAnalysis = async () => {
-    if (!caseId || isAnalyzing) return;
+    if (!activeCaseId || isAnalyzing) return;
     setIsAnalyzing(true);
     setSuccessMsg(null);
     try {
-      const res = await triggerPipelineAnalysis(caseId);
+      const res = await triggerPipelineAnalysis(activeCaseId);
       setSuccessMsg(res.message || "Pipeline analysis executed successfully.");
       loadRuns();
     } catch {
@@ -63,75 +69,60 @@ export default function AnalysisPage() {
         <button
           onClick={handleRunAnalysis}
           disabled={isAnalyzing}
-          className="px-4 py-2 rounded bg-nexus-600 hover:bg-nexus-500 disabled:opacity-50 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+          className="px-4 py-2 rounded bg-nexus-600 hover:bg-nexus-500 text-xs font-semibold text-white flex items-center gap-2 transition-colors disabled:opacity-50"
         >
           {isAnalyzing ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Executing Pipeline...</span>
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <span>Analyzing Network Topology...</span>
             </>
           ) : (
             <>
-              <Play className="w-4 h-4" />
-              <span>Trigger Full Analysis Pipeline</span>
+              <Play className="w-3.5 h-3.5" />
+              <span>Trigger Full Analytics Pipeline</span>
             </>
           )}
         </button>
       </div>
 
       {successMsg && (
-        <div className="p-3 rounded bg-emerald-950/40 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-400 text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4" />
           <span>{successMsg}</span>
         </div>
       )}
 
-      {/* Analysis Runs Table */}
-      <div className="rounded-lg bg-surface border border-border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-surface-raised/80 border-b border-border text-[10px] text-slate-400 uppercase tracking-wider">
-              <tr>
-                <th className="px-4 py-3">Run ID</th>
-                <th className="px-4 py-3">Pipeline Type</th>
-                <th className="px-4 py-3">Started At</th>
-                <th className="px-4 py-3">Duration</th>
-                <th className="px-4 py-3">Entities Processed</th>
-                <th className="px-4 py-3">Alerts Generated</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {runs.map((r) => (
-                <tr key={r.id} className="hover:bg-surface-hover/70 transition-colors">
-                  <td className="px-4 py-3 font-mono text-[10px] text-slate-400">
-                    {r.id.substring(0, 8)}...
-                  </td>
-                  <td className="px-4 py-3 font-bold text-white">{r.run_type}</td>
-                  <td className="px-4 py-3 text-slate-400 text-[11px]">
-                    {new Date(r.started_at).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 text-slate-300">{r.duration_seconds}s</td>
-                  <td className="px-4 py-3 text-nexus-400 font-bold">{r.entities_extracted}</td>
-                  <td className="px-4 py-3 text-red-400 font-bold">{r.alerts_generated}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        r.status === "COMPLETED"
-                          ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
-                          : r.status === "PROCESSING"
-                          ? "bg-blue-950 text-blue-400 border border-blue-800"
-                          : "bg-red-950 text-red-400 border border-red-800"
-                      }`}
-                    >
-                      {r.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Analysis Runs List */}
+      <div className="p-5 rounded-lg bg-surface border border-border space-y-4">
+        <h2 className="text-xs font-bold text-white uppercase tracking-wider">
+          Completed Analysis Runs ({runs.length})
+        </h2>
+
+        {runs.length === 0 ? (
+          <p className="text-xs text-slate-400">No pipeline analysis runs recorded for this case.</p>
+        ) : (
+          <div className="space-y-3">
+            {runs.map((run) => (
+              <div
+                key={run.id}
+                className="p-4 rounded bg-surface-raised border border-border/70 space-y-2 text-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white">{run.run_type}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-400 font-bold">
+                    {run.status}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-400 pt-1">
+                  <div>Entities Extracted: <span className="text-white font-bold">{run.entities_extracted}</span></div>
+                  <div>Relationships: <span className="text-white font-bold">{run.relationships_extracted}</span></div>
+                  <div>Alerts Generated: <span className="text-white font-bold">{run.alerts_generated}</span></div>
+                  <div>Duration: <span className="text-white font-bold">{run.duration_seconds}s</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

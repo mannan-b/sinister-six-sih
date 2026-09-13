@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { PhoneCall, Search, AlertTriangle, ShieldCheck } from "lucide-react";
 import { fetchCases } from "@/lib/api/cases";
 import { fetchCommunications } from "@/lib/api/communications";
@@ -9,25 +10,31 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { Communication } from "@/types";
 
 export default function CommunicationsPage() {
-  const [caseId, setCaseId] = useState<string>("");
+  const router = useRouter();
+  const params = useParams();
+  const routeCaseId = params?.caseId as string | undefined;
+
+  const [caseId, setCaseId] = useState<string>(routeCaseId || "");
   const [comms, setComms] = useState<Communication[]>([]);
   const [anomalyOnly, setAnomalyOnly] = useState(false);
   const [searchPhone, setSearchPhone] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!caseId) {
+    if (!caseId && !routeCaseId) {
       fetchCases().then((cases) => {
         if (cases.length > 0) setCaseId(cases[0].id);
       });
     }
-  }, [caseId]);
+  }, [caseId, routeCaseId]);
+
+  const activeCaseId = routeCaseId || caseId;
 
   useEffect(() => {
-    if (!caseId) return;
+    if (!activeCaseId) return;
     setLoading(true);
     fetchCommunications({
-      case_id: caseId,
+      case_id: activeCaseId,
       is_anomalous: anomalyOnly ? true : undefined,
       phone: searchPhone.trim() || undefined,
       limit: 100,
@@ -35,7 +42,7 @@ export default function CommunicationsPage() {
       .then((data) => setComms(data))
       .catch(() => setComms([]))
       .finally(() => setLoading(false));
-  }, [caseId, anomalyOnly, searchPhone]);
+  }, [activeCaseId, anomalyOnly, searchPhone]);
 
   return (
     <div className="space-y-4 font-mono select-none">
@@ -47,7 +54,7 @@ export default function CommunicationsPage() {
             <span>Call Detail Records (CDR) & Communication Bursts</span>
           </h1>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            Communication frequency, duration analysis, and late-night burst detection ({comms.length} records)
+            Communication frequency, duration analysis, and burst detection ({comms.length} records)
           </p>
         </div>
 
@@ -59,7 +66,7 @@ export default function CommunicationsPage() {
               value={searchPhone}
               onChange={(e) => setSearchPhone(e.target.value)}
               placeholder="Search phone number..."
-              className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border text-xs text-white placeholder:text-slate-500"
+              className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-white"
             />
           </div>
 
@@ -68,14 +75,14 @@ export default function CommunicationsPage() {
               type="checkbox"
               checked={anomalyOnly}
               onChange={(e) => setAnomalyOnly(e.target.checked)}
-              className="accent-orange-500 rounded"
+              className="rounded bg-surface-raised border-border text-nexus-600 focus:ring-0"
             />
-            <span className="text-orange-400 font-semibold">Flagged Bursts Only</span>
+            <span>Anomalies Only</span>
           </label>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Communications Table */}
       <div className="rounded-lg bg-surface border border-border overflow-hidden">
         {loading ? (
           <div className="p-8">
@@ -83,7 +90,20 @@ export default function CommunicationsPage() {
           </div>
         ) : comms.length === 0 ? (
           <div className="p-8">
-            <EmptyState title="No Communications Found" description="No CDR records matched the filter criteria." />
+            <EmptyState
+              title="No Communication Records Found"
+              description={
+                searchPhone || anomalyOnly
+                  ? "No records matched the filter criteria."
+                  : "No Call Detail Records (CDR) or communication logs found for this case."
+              }
+              actionLabel={searchPhone || anomalyOnly ? undefined : "Upload CDR CSV"}
+              onAction={
+                searchPhone || anomalyOnly
+                  ? undefined
+                  : () => router.push(activeCaseId ? `/cases/${activeCaseId}/sources` : "/sources")
+              }
+            />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -91,11 +111,12 @@ export default function CommunicationsPage() {
               <thead className="bg-surface-raised/80 border-b border-border text-[10px] text-slate-400 uppercase tracking-wider">
                 <tr>
                   <th className="px-4 py-3">Timestamp</th>
-                  <th className="px-4 py-3">Caller Phone</th>
-                  <th className="px-4 py-3">Receiver Phone</th>
+                  <th className="px-4 py-3">Caller</th>
+                  <th className="px-4 py-3">Receiver</th>
                   <th className="px-4 py-3">Duration</th>
+                  <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Anomaly Reason</th>
+                  <th className="px-4 py-3">Detection Reason</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -103,7 +124,7 @@ export default function CommunicationsPage() {
                   <tr
                     key={c.id}
                     className={`hover:bg-surface-hover/70 transition-colors ${
-                      c.is_anomalous ? "bg-orange-950/20" : ""
+                      c.is_anomalous ? "bg-red-950/20" : ""
                     }`}
                   >
                     <td className="px-4 py-3 text-slate-400 text-[11px]">
@@ -116,30 +137,39 @@ export default function CommunicationsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-bold text-white">{c.caller_phone}</div>
-                      {c.caller_name && <div className="text-[10px] text-slate-500">{c.caller_name}</div>}
+                      {c.caller_name && c.caller_name !== c.caller_phone && (
+                        <div className="text-[10px] text-slate-500">{c.caller_name}</div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-bold text-white">{c.receiver_phone}</div>
-                      {c.receiver_name && <div className="text-[10px] text-slate-500">{c.receiver_name}</div>}
+                      {c.receiver_name && c.receiver_name !== c.receiver_phone && (
+                        <div className="text-[10px] text-slate-500">{c.receiver_name}</div>
+                      )}
                     </td>
-                    <td className="px-4 py-3 text-slate-200">
+                    <td className="px-4 py-3 text-slate-300">
                       {Math.floor(c.duration_seconds / 60)}m {c.duration_seconds % 60}s
                     </td>
                     <td className="px-4 py-3">
+                      <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-300">
+                        {c.communication_type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
                       {c.is_anomalous ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-orange-950 border border-orange-700 text-orange-300">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 border border-red-700 text-red-300">
                           <AlertTriangle className="w-3 h-3" />
-                          BURST FLAGGED
+                          ANOMALY
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-emerald-950 border border-emerald-800 text-emerald-400">
                           <ShieldCheck className="w-3 h-3" />
-                          STANDARD
+                          NORMAL
                         </span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-[11px] text-slate-400 max-w-xs truncate">
-                      {c.anomaly_reason || "Normal calling pattern"}
+                      {c.anomaly_reason || "Within baseline call parameters"}
                     </td>
                   </tr>
                 ))}

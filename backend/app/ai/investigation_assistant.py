@@ -259,9 +259,31 @@ class InvestigationAssistant:
                 ]
             )
 
+        case = db.query(Case).filter(Case.id == case_id).first()
+        case_name = case.name if case else "Active Investigation"
+
+        # Handle empty case with zero entities
+        if len(entities) == 0:
+            fir_str = f" ({case.fir_number or case.case_number})" if case and (case.fir_number or case.case_number) else ""
+            return AssistantQueryResponse(
+                answer=(
+                    f"### Investigation Status for {case_name}{fir_str}\n\n"
+                    f"No entities, relationships, or evidence records have been ingested yet for this case.\n\n"
+                    f"Please ingest investigation sources (FIR reports, Call Detail Records, or banking transactions) to begin AI-powered link analysis and anomaly detection."
+                ),
+                evidence=[],
+                relevant_entities=[],
+                relevant_relationships=[],
+                confidence="High",
+                suggested_queries=[
+                    "Upload investigation documents",
+                    "Ingest CDR call records",
+                    "Import bank statements"
+                ]
+            )
+
         # Intent 6: Investigation Summary
         # e.g., "Give me a summary of this investigation"
-        case = db.query(Case).filter(Case.id == case_id).first()
         top_risk_ents = sorted(entities, key=lambda x: (x.risk_score or 0.0), reverse=True)[:5]
         alerts = db.query(Alert).filter(Alert.case_id == case_id).all()
         bridges = community_detector.identify_bridge_nodes(db, case_id)
@@ -314,6 +336,22 @@ class InvestigationAssistant:
     def generate_investigation_summary(self, db: Session, case_id: str) -> InvestigationSummaryResponse:
         case = db.query(Case).filter(Case.id == case_id).first()
         entities = db.query(Entity).filter(Entity.case_id == case_id).all()
+        
+        if len(entities) == 0:
+            case_title = case.name if case else "Investigation"
+            fir_str = f" ({case.fir_number or case.case_number})" if case and (case.fir_number or case.case_number) else ""
+            return InvestigationSummaryResponse(
+                case_id=case_id,
+                case_name=case.name if case else "Active Investigation",
+                executive_summary=f"Investigation {case_title}{fir_str} currently contains no intelligence records or extracted entities. Upload sources or ingest evidence to generate knowledge graph analytics.",
+                key_entities=[],
+                important_relationships=[],
+                major_anomalies=[],
+                communities=[],
+                potential_intermediaries=[],
+                timeline_highlights=[]
+            )
+
         relationships = db.query(Relationship).filter(Relationship.case_id == case_id).all()
         alerts = db.query(Alert).filter(Alert.case_id == case_id).all()
         events = db.query(Event).filter(Event.case_id == case_id).order_by(Event.timestamp.asc()).all()

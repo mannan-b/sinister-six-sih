@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
 import { fetchCases } from "@/lib/api/cases";
 import { fetchTimeline } from "@/lib/api/timeline";
@@ -10,26 +11,32 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { TimelineEvent } from "@/types";
 
 export default function TimelinePage() {
-  const [caseId, setCaseId] = useState<string>("");
+  const router = useRouter();
+  const params = useParams();
+  const routeCaseId = params?.caseId as string | undefined;
+
+  const [caseId, setCaseId] = useState<string>(routeCaseId || "");
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!caseId) {
+    if (!caseId && !routeCaseId) {
       fetchCases().then((cases) => {
         if (cases.length > 0) setCaseId(cases[0].id);
       });
     }
-  }, [caseId]);
+  }, [caseId, routeCaseId]);
+
+  const activeCaseId = routeCaseId || caseId;
 
   useEffect(() => {
-    if (!caseId) return;
+    if (!activeCaseId) return;
     setLoading(true);
-    fetchTimeline({ case_id: caseId, limit: 100 })
+    fetchTimeline({ case_id: activeCaseId, limit: 100 })
       .then((data) => setEvents(data))
       .catch(() => setEvents([]))
       .finally(() => setLoading(false));
-  }, [caseId]);
+  }, [activeCaseId]);
 
   return (
     <div className="space-y-4 font-mono select-none">
@@ -46,7 +53,14 @@ export default function TimelinePage() {
       {loading ? (
         <LoadingSkeleton text="Loading investigation timeline..." />
       ) : events.length === 0 ? (
-        <EmptyState title="No Events Recorded" description="No timeline events exist for the selected case." />
+        <div className="p-4">
+          <EmptyState
+            title="No Timeline Events Recorded"
+            description="No timeline events recorded for this case. Upload surveillance logs or incident records to build the chronology."
+            actionLabel="Upload Case Sources"
+            onAction={() => router.push(activeCaseId ? `/cases/${activeCaseId}/sources` : "/sources")}
+          />
+        </div>
       ) : (
         <TimelineView events={events} />
       )}

@@ -1,8 +1,16 @@
 import io
 import csv
-import pandas as pd
+from dateutil import parser as dt_parser
 from typing import List, Dict, Any, Tuple
 from datetime import datetime
+
+def _safe_parse_dt(val: str) -> datetime:
+    if not val or not val.strip():
+        return datetime.utcnow()
+    try:
+        return dt_parser.parse(val.strip())
+    except Exception:
+        return datetime.utcnow()
 
 class FileParser:
     @staticmethod
@@ -41,10 +49,7 @@ class FileParser:
                 except ValueError:
                     duration = 0
 
-                try:
-                    ts = pd.to_datetime(date_str).to_pydatetime() if date_str else datetime.utcnow()
-                except Exception:
-                    ts = datetime.utcnow()
+                ts = _safe_parse_dt(date_str)
 
                 records.append({
                     "caller_phone": caller,
@@ -96,10 +101,7 @@ class FileParser:
                     errors.append(f"Row {row_idx}: Invalid numeric amount '{amt_str}'.")
                     continue
 
-                try:
-                    ts = pd.to_datetime(date_str).to_pydatetime() if date_str else datetime.utcnow()
-                except Exception:
-                    ts = datetime.utcnow()
+                ts = _safe_parse_dt(date_str)
 
                 records.append({
                     "sender_account": sender,

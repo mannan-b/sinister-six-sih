@@ -1,7 +1,5 @@
 import numpy as np
-import pandas as pd
 from typing import List, Dict, Any
-from sklearn.ensemble import IsolationForest
 from sqlalchemy.orm import Session
 from app.models.transaction import Transaction
 from app.models.alert import Alert
@@ -13,59 +11,44 @@ class TransactionAnomalyDetector:
         if len(transactions) < 3:
             return []
 
-        # Convert to DataFrame
-        data = []
-        for t in transactions:
-            data.append({
-                "id": t.id,
-                "amount": float(t.amount),
-                "sender_account": t.sender_account,
-                "receiver_account": t.receiver_account,
-                "sender_id": t.sender_id,
-                "receiver_id": t.receiver_id,
-                "timestamp": t.timestamp,
-                "hour": t.timestamp.hour if t.timestamp else 12
-            })
-        df = pd.DataFrame(data)
+        amounts = np.array([float(t.amount) for t in transactions], dtype=float)
+        mean_amt = float(np.mean(amounts))
+        std_amt = float(np.std(amounts)) if len(amounts) > 1 else 1.0
+        p95 = float(np.percentile(amounts, 95))
 
-        # Statistical Thresholds
-        mean_amt = df["amount"].mean()
-        std_amt = df["amount"].std() if len(df) > 1 else 1.0
-        p95 = df["amount"].quantile(0.95)
-
-        # Isolation Forest on amount and time features
-        features = df[["amount", "hour"]].values
+        # Isolation Forest on amount and time features with robust fallback
         try:
+            from sklearn.ensemble import IsolationForest
+            features = np.array([[float(t.amount), t.timestamp.hour if t.timestamp else 12] for t in transactions])
             iso = IsolationForest(contamination=0.15, random_state=42)
             preds = iso.fit_predict(features)
             scores = -iso.score_samples(features)
         except Exception:
             # Fallback to pure statistical z-score
-            z_scores = np.abs((df["amount"] - mean_amt) / (std_amt + 1e-6))
+            z_scores = np.abs((amounts - mean_amt) / (std_amt + 1e-6))
             preds = np.where(z_scores > 2.0, -1, 1)
             scores = z_scores / 3.0
 
         anomalies = []
-        tx_dict = {t.id: t for t in transactions}
-
-        for idx, row in df.iterrows():
-            is_anomaly = (preds[idx] == -1) or (row["amount"] >= p95 and row["amount"] > 200000)
+        for idx, t in enumerate(transactions):
+            amt = float(t.amount)
+            hour = t.timestamp.hour if t.timestamp else 12
+            is_anomaly = bool((preds[idx] == -1) or (amt >= p95 and amt > 200000))
             score = float(scores[idx])
 
-            t = tx_dict[row["id"]]
-            t.is_anomalous = bool(is_anomaly)
+            t.is_anomalous = is_anomaly
             t.anomaly_score = round(score, 3)
 
             if is_anomaly:
                 reasons = []
-                if row["amount"] >= p95:
-                    reasons.append(f"Amount ₹{row['amount']:,.2f} exceeds 95th percentile threshold (₹{p95:,.2f})")
-                if row["amount"] > mean_amt + (1.5 * std_amt):
+                if amt >= p95:
+                    reasons.append(f"Amount ₹{amt:,.2f} exceeds 95th percentile threshold (₹{p95:,.2f})")
+                if amt > mean_amt + (1.5 * std_amt):
                     reasons.append(f"Statistically unusual transfer value (Z-score > 1.5)")
-                if row["hour"] < 6 or row["hour"] > 22:
-                    reasons.append(f"Transaction occurred during unusual hours ({row['hour']:02d}:00)")
+                if hour < 6 or hour > 22:
+                    reasons.append(f"Transaction occurred during unusual hours ({hour:02d}:00)")
                 
-                reason_text = "; ".join(reasons) if reasons else "High anomaly score detected by Isolation Forest"
+                reason_text = "; ".join(reasons) if reasons else "High anomaly score detected by model"
                 t.anomaly_reason = reason_text
 
                 anomalies.append({

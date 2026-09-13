@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeftRight, Search, AlertTriangle, ShieldCheck } from "lucide-react";
 import { fetchCases } from "@/lib/api/cases";
 import { fetchTransactions } from "@/lib/api/transactions";
@@ -9,25 +10,31 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { Transaction } from "@/types";
 
 export default function TransactionsPage() {
-  const [caseId, setCaseId] = useState<string>("");
+  const router = useRouter();
+  const params = useParams();
+  const routeCaseId = params?.caseId as string | undefined;
+
+  const [caseId, setCaseId] = useState<string>(routeCaseId || "");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [anomalyOnly, setAnomalyOnly] = useState(false);
   const [searchAccount, setSearchAccount] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!caseId) {
+    if (!caseId && !routeCaseId) {
       fetchCases().then((cases) => {
         if (cases.length > 0) setCaseId(cases[0].id);
       });
     }
-  }, [caseId]);
+  }, [caseId, routeCaseId]);
+
+  const activeCaseId = routeCaseId || caseId;
 
   useEffect(() => {
-    if (!caseId) return;
+    if (!activeCaseId) return;
     setLoading(true);
     fetchTransactions({
-      case_id: caseId,
+      case_id: activeCaseId,
       is_anomalous: anomalyOnly ? true : undefined,
       account: searchAccount.trim() || undefined,
       limit: 100,
@@ -35,7 +42,7 @@ export default function TransactionsPage() {
       .then((data) => setTransactions(data))
       .catch(() => setTransactions([]))
       .finally(() => setLoading(false));
-  }, [caseId, anomalyOnly, searchAccount]);
+  }, [activeCaseId, anomalyOnly, searchAccount]);
 
   return (
     <div className="space-y-4 font-mono select-none">
@@ -47,7 +54,7 @@ export default function TransactionsPage() {
             <span>Financial Transactions & Fund Traces</span>
           </h1>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            Banking ledgers evaluated with Isolation Forest anomaly detection ({transactions.length} records)
+            Banking ledgers evaluated with anomaly detection ({transactions.length} records)
           </p>
         </div>
 
@@ -59,7 +66,7 @@ export default function TransactionsPage() {
               value={searchAccount}
               onChange={(e) => setSearchAccount(e.target.value)}
               placeholder="Search account..."
-              className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border text-xs text-white placeholder:text-slate-500"
+              className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-white"
             />
           </div>
 
@@ -68,14 +75,14 @@ export default function TransactionsPage() {
               type="checkbox"
               checked={anomalyOnly}
               onChange={(e) => setAnomalyOnly(e.target.checked)}
-              className="accent-red-500 rounded"
+              className="rounded bg-surface-raised border-border text-nexus-600 focus:ring-0"
             />
-            <span className="text-red-400 font-semibold">Flagged Anomalies Only</span>
+            <span>Anomalies Only</span>
           </label>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Transactions Table */}
       <div className="rounded-lg bg-surface border border-border overflow-hidden">
         {loading ? (
           <div className="p-8">
@@ -83,7 +90,20 @@ export default function TransactionsPage() {
           </div>
         ) : transactions.length === 0 ? (
           <div className="p-8">
-            <EmptyState title="No Transactions Found" description="No records matched the filter criteria." />
+            <EmptyState
+              title="No Financial Transactions Found"
+              description={
+                searchAccount || anomalyOnly
+                  ? "No records matched the filter criteria."
+                  : "No financial transactions recorded for this investigation."
+              }
+              actionLabel={searchAccount || anomalyOnly ? undefined : "Upload Bank Statements"}
+              onAction={
+                searchAccount || anomalyOnly
+                  ? undefined
+                  : () => router.push(activeCaseId ? `/cases/${activeCaseId}/sources` : "/sources")
+              }
+            />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -122,8 +142,8 @@ export default function TransactionsPage() {
                       <div className="font-bold text-white">{t.receiver_account}</div>
                       {t.receiver_name && <div className="text-[10px] text-slate-500">{t.receiver_name}</div>}
                     </td>
-                    <td className="px-4 py-3 font-bold text-white">
-                      ₹{t.amount?.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    <td className="px-4 py-3 font-semibold text-white">
+                      ₹{t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3">
                       {t.is_anomalous ? (

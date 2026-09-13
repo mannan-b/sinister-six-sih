@@ -55,23 +55,19 @@ def seed():
 
     print("[OK] Cleared existing demo database.")
 
-    # 2. Create Cases
+    # 2. Create Cases (Strictly ONE seeded case: Operation Nexus)
     case_nexus = Case(
-        case_number="CAS-2026-NEXUS",
+        case_number="FIR-1023/2026",
+        fir_number="FIR-1023/2026",
         name="Operation Nexus",
         description="Trans-national organized network intelligence, financial trace, and communication topology investigation.",
+        police_station="Cyber Crime Cell",
+        investigating_officer="Inspector Rajesh Sharma",
+        officer_rank="Inspector",
         status="ACTIVE",
-        meta_info={"lead_agency": "Special Intelligence Wing", "priority": "CRITICAL"}
-    )
-    case_delta = Case(
-        case_number="CAS-2026-DELTA",
-        name="Operation Delta Trace",
-        description="Counter-narcotics and illegal logistics cross-state monitoring.",
-        status="UNDER_INVESTIGATION",
-        meta_info={"lead_agency": "Narcotics Control Cell", "priority": "HIGH"}
+        meta_info={"lead_agency": "Cyber Crime Cell", "priority": "CRITICAL"}
     )
     db.add(case_nexus)
-    db.add(case_delta)
     db.commit()
     db.refresh(case_nexus)
     case_id = case_nexus.id
