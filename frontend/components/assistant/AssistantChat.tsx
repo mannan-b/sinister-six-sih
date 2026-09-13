@@ -19,7 +19,7 @@ interface AssistantChatProps {
   initialQuery?: string;
 }
 
-const QUICK_PROMPTS = [
+const DEFAULT_PROMPTS = [
   "How is Rohit Sharma connected to Sameer Khan?",
   "Who are the most influential people in this network?",
   "Which person connects the two largest communities?",
@@ -30,23 +30,69 @@ const QUICK_PROMPTS = [
 
 export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      text: "Hello Investigator. I am NEXUS AI Assistant. I can trace multi-hop network paths, identify intermediary bridge nodes, analyze communication bursts, and explain flagged financial anomalies backed by verifiable knowledge graph evidence.",
-      timestamp: new Date(),
-    },
-  ]);
+  const [context, setContext] = useState<any>(null);
+  const [prompts, setPrompts] = useState<string[]>(DEFAULT_PROMPTS);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (initialQuery) {
+    if (!caseId) return;
+    const ctxStr = sessionStorage.getItem("assistantContext");
+    let ctx = null;
+    if (ctxStr) {
+      try {
+        ctx = JSON.parse(ctxStr);
+        setContext(ctx);
+        // Clear it so it doesn't leak into future generic visits
+        sessionStorage.removeItem("assistantContext");
+      } catch (e) {}
+    }
+
+    if (ctx) {
+      // Initialize with context-aware welcome
+      setLoading(true);
+      askAssistant(caseId, "INIT_CONTEXT", ctx)
+        .then((res) => {
+          setMessages([
+            {
+              id: "welcome",
+              role: "assistant",
+              text: res.answer,
+              timestamp: new Date(),
+            },
+          ]);
+          if (res.suggested_queries && res.suggested_queries.length > 0) {
+            setPrompts(res.suggested_queries);
+          }
+        })
+        .catch(() => {
+          setMessages([{ id: "welcome", role: "assistant", text: "Hello Investigator. Context initialized but failed to generate specific insights.", timestamp: new Date() }]);
+        })
+        .finally(() => {
+          setLoading(false);
+          setInitialized(true);
+        });
+    } else {
+      setMessages([
+        {
+          id: "welcome",
+          role: "assistant",
+          text: "Hello Investigator. I am NEXUS AI Assistant. I can trace multi-hop network paths, identify intermediary bridge nodes, analyze communication bursts, and explain flagged financial anomalies backed by verifiable knowledge graph evidence.",
+          timestamp: new Date(),
+        },
+      ]);
+      setInitialized(true);
+    }
+  }, [caseId]);
+
+  useEffect(() => {
+    if (initialized && initialQuery) {
       handleSend(initialQuery);
     }
-  }, [initialQuery]);
+  }, [initialQuery, initialized]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,7 +114,7 @@ export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
     setLoading(true);
 
     try {
-      const res = await askAssistant(caseId, q);
+      const res = await askAssistant(caseId, q, context);
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -77,6 +123,9 @@ export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
+      if (res.suggested_queries && res.suggested_queries.length > 0) {
+        setPrompts(res.suggested_queries);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -226,7 +275,7 @@ export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
       <div className="px-4 py-2 bg-surface-raised/40 border-t border-border/50">
         <p className="text-[10px] text-slate-400 mb-1.5">Suggested Investigation Inquiries:</p>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
-          {QUICK_PROMPTS.map((prompt, idx) => (
+          {prompts.map((prompt, idx) => (
             <button
               key={idx}
               onClick={() => handleSend(prompt)}

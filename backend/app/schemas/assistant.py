@@ -9,6 +9,7 @@ class AssistantQueryRequest(BaseModel):
     query: str
     case_id: str
     history: Optional[List[AssistantMessage]] = []
+    context: Optional[Dict[str, Any]] = None
 
 class AssistantEvidenceItem(BaseModel):
     title: str

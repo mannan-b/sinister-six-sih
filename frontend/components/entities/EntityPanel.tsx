@@ -178,9 +178,10 @@ export function EntityPanel({ entityId, onClose }: EntityPanelProps) {
               {/* Action Bar */}
               <div className="pt-2">
                 <button
-                  onClick={() =>
-                    router.push(`/assistant?query=Why is ${profile.entity.display_name} considered high risk?`)
-                  }
+                  onClick={() => {
+                    sessionStorage.setItem("assistantContext", JSON.stringify({ type: "entity", data: profile.entity }));
+                    router.push(`/cases/${profile.entity.case_id}/assistant`);
+                  }}
                   className="w-full py-2 px-3 rounded bg-nexus-600 hover:bg-nexus-500 text-white font-medium flex items-center justify-center gap-2 transition-colors shadow-sm text-xs truncate"
                 >
                   <Bot className="w-4 h-4 shrink-0" />

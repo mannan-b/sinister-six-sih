@@ -65,15 +65,26 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
           <h3 className="text-sm font-bold text-white pt-1">{alert.title}</h3>
         </div>
 
-        {alert.entity_id && (
+        <div className="flex items-center gap-2">
+          {alert.entity_id && (
+            <button
+              onClick={() => router.push(`/explorer?highlight=${alert.entity_id}`)}
+              className="px-2.5 py-1 rounded bg-surface-raised border border-border hover:border-nexus-500 text-[10px] text-nexus-300 flex items-center gap-1 transition-colors"
+            >
+              <span>View in Graph</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          )}
           <button
-            onClick={() => router.push(`/explorer?highlight=${alert.entity_id}`)}
-            className="px-2.5 py-1 rounded bg-surface-raised border border-border hover:border-nexus-500 text-[10px] text-nexus-300 flex items-center gap-1 transition-colors"
+            onClick={() => {
+              sessionStorage.setItem("assistantContext", JSON.stringify({ type: "alert", data: alert }));
+              router.push(`/cases/${alert.case_id}/assistant`);
+            }}
+            className="px-2.5 py-1 rounded bg-nexus-600 hover:bg-nexus-500 text-[10px] text-white flex items-center gap-1 transition-colors shadow-sm"
           >
-            <span>View in Graph</span>
-            <ArrowRight className="w-3 h-3" />
+            <span>Ask AI Copilot</span>
           </button>
-        )}
+        </div>
       </div>
 
       {/* Explanation */}

@@ -14,7 +14,7 @@ from app.schemas.assistant import AssistantQueryResponse, AssistantEvidenceItem,
 from app.ai.llm_provider import get_llm_provider
 
 class InvestigationAssistant:
-    def process_query(self, db: Session, case_id: str, query: str) -> AssistantQueryResponse:
+    def process_query(self, db: Session, case_id: str, query: str, context: Optional[Dict[str, Any]] = None) -> AssistantQueryResponse:
         """
         Processes an investigator query using structured graph retrieval and evidence extraction.
         """
@@ -22,6 +22,76 @@ class InvestigationAssistant:
         entities = db.query(Entity).filter(Entity.case_id == case_id).all()
         ent_by_name = {e.display_name.lower(): e for e in entities}
         ent_by_canonical = {e.canonical_name.lower(): e for e in entities}
+
+        if context:
+            ctx_type = context.get("type")
+            ctx_data = context.get("data", {})
+            
+            if q_lower == "init_context":
+                if ctx_type == "alert":
+                    title = ctx_data.get("title", "Anomaly")
+                    cat = ctx_data.get("category", "").replace("_", " ").title()
+                    ent_name = ctx_data.get("entity_name") or "the involved entities"
+                    severity = ctx_data.get("severity", "UNKNOWN")
+                    
+                    answer_text = f"Hello Investigator. I am ready to investigate the {severity} severity alert: **{title}**.\n\nThis was flagged under the {cat} category. What would you like to know about {ent_name} or this anomaly?"
+                    suggested_queries = [
+                        "Why was this anomaly flagged?",
+                        f"Who are the entities connected to this anomaly?",
+                        "Show related anomalies/events",
+                        f"What other suspicious activity is associated with {ent_name}?"
+                    ]
+                    return AssistantQueryResponse(answer=answer_text, evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=suggested_queries)
+                
+                elif ctx_type == "entity":
+                    name = ctx_data.get("display_name", "this entity")
+                    risk_level = ctx_data.get("risk_level", "Unknown")
+                    risk_score = ctx_data.get("risk_score", 0)
+                    
+                    answer_text = f"Hello Investigator. I am ready to investigate **{name}**, currently assessed at **{risk_level} risk** (Score: {risk_score}/100).\n\nI can trace their network connections, analyze their communications, or explain their risk factors. How should we proceed?"
+                    suggested_queries = [
+                        f"Why is {name} considered high risk?",
+                        f"Who are {name}'s direct connections?",
+                        f"Show unusual transactions involving {name}",
+                        f"Summarize {name}'s timeline of events"
+                    ]
+                    return AssistantQueryResponse(answer=answer_text, evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=suggested_queries)
+            
+            # Context-aware answers based on the selected context
+            if ctx_type == "alert":
+                if any(k in q_lower for k in ["why", "reason", "flagged", "explanation", "evidence"]):
+                    evidence_items = []
+                    for ev in ctx_data.get("evidence", []):
+                        evidence_items.append(AssistantEvidenceItem(title="Supporting Evidence", description=ev, source="Anomaly Detection Engine"))
+                    
+                    answer = f"The anomaly **{ctx_data.get('title')}** was flagged because:\n\n{ctx_data.get('explanation')}\n\nReview the verifiable evidence below for more details."
+                    return AssistantQueryResponse(answer=answer, evidence=evidence_items, relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=["What other suspicious activity is associated with these entities?"])
+                
+                if any(k in q_lower for k in ["entities", "who", "people", "involved"]):
+                    ent_name = ctx_data.get("entity_name")
+                    if ent_name:
+                        answer = f"This anomaly is primarily associated with **{ent_name}**. You can investigate their specific risk profile or trace their connections in the network."
+                        return AssistantQueryResponse(answer=answer, evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=[f"Why is {ent_name} considered high risk?"])
+                
+                if any(k in q_lower for k in ["related", "other suspicious"]):
+                    ent_id = ctx_data.get("entity_id")
+                    ent_name = ctx_data.get("entity_name") or "this entity"
+                    if ent_id:
+                        rel_alerts = db.query(Alert).filter(Alert.case_id == case_id, Alert.entity_id == ent_id, Alert.id != ctx_data.get("id")).all()
+                        if rel_alerts:
+                            ans = f"Found {len(rel_alerts)} other alerts associated with the same entity:\n\n" + "\n".join([f"• **{a.title}** ({a.severity})" for a in rel_alerts])
+                            return AssistantQueryResponse(answer=ans, evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=[f"Why is {ent_name} considered high risk?"])
+                        else:
+                            return AssistantQueryResponse(answer="I did not find any other anomalies associated with this specific entity in the current case.", evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=[])
+
+            elif ctx_type == "entity":
+                if any(k in q_lower for k in ["timeline", "events", "recent"]):
+                    events = db.query(Event).filter(Event.case_id == case_id, Event.involved_entity_ids.contains([ctx_data.get("id")])).all()
+                    if events:
+                        ans = f"Timeline events for **{ctx_data.get('display_name')}**:\n\n" + "\n".join([f"• {e.timestamp.strftime('%Y-%m-%d')}: {e.title}" for e in events])
+                        return AssistantQueryResponse(answer=ans, evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=[f"Why is {ctx_data.get('display_name')} considered high risk?"])
+                    else:
+                        return AssistantQueryResponse(answer=f"No specific timeline events found for {ctx_data.get('display_name')}.", evidence=[], relevant_entities=[], relevant_relationships=[], confidence="High", suggested_queries=[])
 
         # Intent 1: Connection / Shortest Path between two entities
         # e.g., "How is Rohit Sharma connected to Sameer Khan?"
@@ -283,44 +353,74 @@ class InvestigationAssistant:
             )
 
         # Intent 6: Investigation Summary
-        # e.g., "Give me a summary of this investigation"
-        top_risk_ents = sorted(entities, key=lambda x: (x.risk_score or 0.0), reverse=True)[:5]
-        alerts = db.query(Alert).filter(Alert.case_id == case_id).all()
-        bridges = community_detector.identify_bridge_nodes(db, case_id)
+        if any(k in q_lower for k in ["summary", "summarize", "overview"]):
+            top_risk_ents = sorted(entities, key=lambda x: (x.risk_score or 0.0), reverse=True)[:5]
+            alerts = db.query(Alert).filter(Alert.case_id == case_id).all()
+            bridges = community_detector.identify_bridge_nodes(db, case_id)
 
-        evidence_items = [
-            AssistantEvidenceItem(
-                title=f"Network Size",
-                description=f"{len(entities)} entities, {db.query(Relationship).filter(Relationship.case_id == case_id).count()} relationships, {len(alerts)} alerts generated.",
-                source="Case Database",
-                confidence=1.0
+            evidence_items = [
+                AssistantEvidenceItem(
+                    title=f"Network Size",
+                    description=f"{len(entities)} entities, {db.query(Relationship).filter(Relationship.case_id == case_id).count()} relationships, {len(alerts)} alerts generated.",
+                    source="Case Database",
+                    confidence=1.0
+                )
+            ]
+
+            bridge_summary = f"Key bridge node: **{bridges[0]['name']}** (Betweenness: {bridges[0]['betweenness']:.3f})" if bridges else "No single critical bridge node identified."
+
+            answer_text = (
+                f"### Investigation Summary for {case.name if case else 'Operation Nexus'}\n\n"
+                f"**Network Overview**:\n"
+                f"• **Entities Analyzed**: {len(entities)}\n"
+                f"• **Active Alerts**: {len(alerts)}\n"
+                f"• **Intermediary Analysis**: {bridge_summary}\n\n"
+                f"**Highest Priority Investigative Indicators**:\n" +
+                "\n".join([f"• **{e.display_name}** ({e.type}): Risk Score {e.risk_score}/100 ({e.risk_level})" for e in top_risk_ents]) +
+                f"\n\n**Investigative Focus**: Focus inquiry on bridge nodes and transaction routes connecting primary clusters."
             )
-        ]
 
-        bridge_summary = f"Key bridge node: **{bridges[0]['name']}** (Betweenness: {bridges[0]['betweenness']:.3f})" if bridges else "No single critical bridge node identified."
+            return AssistantQueryResponse(
+                answer=answer_text,
+                evidence=evidence_items,
+                relevant_entities=[{"id": e.id, "name": e.display_name, "type": e.type, "risk_score": e.risk_score} for e in top_risk_ents],
+                relevant_relationships=[],
+                confidence="High",
+                suggested_queries=[
+                    "How is Rohit Sharma connected to Sameer Khan?",
+                    "Why is Amit Verma important?",
+                    "Show unusual transactions"
+                ]
+            )
 
-        answer_text = (
-            f"### Investigation Summary for {case.name if case else 'Operation Nexus'}\n\n"
-            f"**Network Overview**:\n"
-            f"• **Entities Analyzed**: {len(entities)}\n"
-            f"• **Active Alerts**: {len(alerts)}\n"
-            f"• **Intermediary Analysis**: {bridge_summary}\n\n"
-            f"**Highest Priority Investigative Indicators**:\n" +
-            "\n".join([f"• **{e.display_name}** ({e.type}): Risk Score {e.risk_score}/100 ({e.risk_level})" for e in top_risk_ents]) +
-            f"\n\n**Investigative Focus**: Focus inquiry on bridge nodes and transaction routes connecting primary clusters."
+        # Intent 7: Real LLM Fallback
+        # If the query doesn't match any strict intent (or if entities weren't found for a path),
+        # use the LLM provider to answer contextually.
+        llm = get_llm_provider()
+        
+        # Build a brief context about the case to inject into the LLM prompt
+        top_risk_ents = sorted(entities, key=lambda x: (x.risk_score or 0.0), reverse=True)[:10]
+        bridges = community_detector.identify_bridge_nodes(db, case_id)
+        
+        system_prompt = (
+            f"You are the NEXUS AI Investigation Assistant. "
+            f"You are assisting an investigator with the case '{case_name}'.\n"
+            f"Here is some context about the current case network:\n"
+            f"- Total Entities: {len(entities)}\n"
+            f"- Top Risk Entities: {', '.join([e.display_name for e in top_risk_ents])}\n"
+            f"- Top Intermediaries/Bridges: {', '.join([b['name'] for b in bridges[:3]])}\n\n"
+            f"Answer the user's question naturally as an AI. If they ask about people or entities not in this case (e.g. celebrities, unrelated figures), answer using your general knowledge but clarify they are not part of the active case."
         )
 
+        llm_answer = llm.generate(prompt=query, system_prompt=system_prompt)
+
         return AssistantQueryResponse(
-            answer=answer_text,
-            evidence=evidence_items,
-            relevant_entities=[{"id": e.id, "name": e.display_name, "type": e.type, "risk_score": e.risk_score} for e in top_risk_ents],
+            answer=llm_answer,
+            evidence=[],
+            relevant_entities=[],
             relevant_relationships=[],
-            confidence="High",
-            suggested_queries=[
-                "How is Rohit Sharma connected to Sameer Khan?",
-                "Why is Amit Verma important?",
-                "Show unusual transactions"
-            ]
+            confidence="Medium",
+            suggested_queries=[]
         )
 
     def _find_entity(self, entities: List[Entity], name_query: str) -> Optional[Entity]:
