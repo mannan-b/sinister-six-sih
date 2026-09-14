@@ -8,6 +8,7 @@ import { fetchTransactions } from "@/lib/api/transactions";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Transaction } from "@/types";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 export default function TransactionsPage() {
   const router = useRouter();
@@ -159,7 +160,7 @@ export default function TransactionsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-[11px] text-zinc-400 max-w-xs truncate">
-                      {t.anomaly_reason || "Within expected transaction bounds"}
+                      <MarkdownRenderer content={t.anomaly_reason || "Within expected transaction bounds"} compact />
                     </td>
                   </tr>
                 ))}

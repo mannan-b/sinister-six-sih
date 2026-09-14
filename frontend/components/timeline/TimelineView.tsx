@@ -5,6 +5,7 @@ import { Clock, MapPin, AlertCircle, ArrowRight, Filter, Calendar } from "lucide
 import { TimelineEvent } from "@/types";
 import { RiskBadge } from "@/components/common/RiskBadge";
 import { useRouter } from "next/navigation";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 interface TimelineViewProps {
   events: TimelineEvent[];
@@ -102,7 +103,7 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
                   </div>
                 </div>
 
-                <p className="text-xs text-zinc-300 leading-relaxed">{ev.description}</p>
+                <MarkdownRenderer content={ev.description} />
 
                 {ev.location_name && (
                   <div className="flex items-center gap-1.5 text-[11px] text-emerald-400">

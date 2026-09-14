@@ -44,6 +44,7 @@ import { EntityBadge } from "@/components/common/EntityBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Case, Entity, Alert, TimelineEvent, GraphData } from "@/types";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 const COLORS = ["#f4f4f5", "#e4e4e7", "#d4d4d8", "#a1a1aa", "#71717a", "#52525b"];
 
@@ -206,11 +207,14 @@ export default function CaseDashboard() {
             </span>
           </div>
 
-          <p className="text-xs text-zinc-400 mt-2 max-w-3xl leading-relaxed">
-            {caseRecord?.description ||
+          <MarkdownRenderer
+            content={
+              caseRecord?.description ||
               caseInfo?.executive_summary ||
-              "Case details and link analysis overview."}
-          </p>
+              "Case details and link analysis overview."
+            }
+            className="mt-2 max-w-3xl text-zinc-400"
+          />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">

@@ -5,6 +5,7 @@ import { Send, Bot, User, Sparkles, ShieldCheck, AlertCircle, FileText, CornerDo
 import { AssistantResponse, AssistantEvidenceItem } from "@/types";
 import { askAssistant } from "@/lib/api/assistant";
 import { useRouter } from "next/navigation";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 interface ChatMessage {
   id: string;
@@ -191,7 +192,7 @@ export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
                   : "bg-black border border-zinc-800 text-zinc-200 space-y-3"
               }`}
             >
-              <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
+              <MarkdownRenderer content={msg.text} />
 
               {/* Structured Evidence Card */}
               {msg.responseObj && msg.responseObj.evidence && msg.responseObj.evidence.length > 0 && (
@@ -220,7 +221,7 @@ export function AssistantChat({ caseId, initialQuery }: AssistantChatProps) {
                             </span>
                           )}
                         </div>
-                        <p className="text-zinc-300 leading-snug">{ev.description}</p>
+                        <MarkdownRenderer content={ev.description} />
                       </div>
                     ))}
                   </div>

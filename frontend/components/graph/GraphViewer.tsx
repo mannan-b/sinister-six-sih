@@ -18,6 +18,7 @@ import {
 import { GraphData, GraphNode, GraphEdge, ShortestPathResult } from "@/types";
 import { cytoscapeStyles } from "@/lib/cytoscape-style";
 import { findShortestPath } from "@/lib/api/graph";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 // Register layout extension safely on client
 if (typeof window !== "undefined") {
@@ -408,9 +409,7 @@ export function GraphViewer({
                   {pathResult.found ? `Path Found (${pathResult.path_length} Hops)` : "No Direct Path"}
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-300 whitespace-pre-line leading-relaxed">
-                {pathResult.explanation}
-              </p>
+              <MarkdownRenderer content={pathResult.explanation} className="text-[11px]" />
             </div>
           )}
         </div>

@@ -8,6 +8,7 @@ import { fetchCommunications } from "@/lib/api/communications";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Communication } from "@/types";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 export default function CommunicationsPage() {
   const router = useRouter();
@@ -169,7 +170,7 @@ export default function CommunicationsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-[11px] text-zinc-400 max-w-xs truncate">
-                      {c.anomaly_reason || "Within baseline call parameters"}
+                      <MarkdownRenderer content={c.anomaly_reason || "Within baseline call parameters"} compact />
                     </td>
                   </tr>
                 ))}

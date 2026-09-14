@@ -24,6 +24,7 @@ import { fetchCases, createCase, updateCase, updateCaseStatus } from "@/lib/api/
 import { Case } from "@/types";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { EmptyState } from "@/components/common/EmptyState";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 export default function CasesPage() {
   const router = useRouter();
@@ -522,10 +523,12 @@ return (
 
 
                   {/* Description */}
-                  <p className="mt-5 text-sm text-neutral-500 leading-relaxed line-clamp-2 min-h-[42px]">
-                    {c.description ||
-                      "No case description has been provided for this investigation."}
-                  </p>
+                  <div className="mt-5 text-sm text-neutral-500 leading-relaxed line-clamp-2 min-h-[42px]">
+                    <MarkdownRenderer
+                      content={c.description || "No case description has been provided for this investigation."}
+                      compact
+                    />
+                  </div>
 
 
                   {/* =================================================

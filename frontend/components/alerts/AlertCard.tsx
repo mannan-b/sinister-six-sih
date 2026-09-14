@@ -5,6 +5,7 @@ import { AlertTriangle, CheckCircle, EyeOff, ShieldAlert, ArrowRight, FileText }
 import { Alert } from "@/types";
 import { useRouter } from "next/navigation";
 import { updateAlertStatus } from "@/lib/api/alerts";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 interface AlertCardProps {
   alert: Alert;
@@ -88,7 +89,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
       </div>
 
       {/* Explanation */}
-      <p className="text-zinc-300 text-xs leading-relaxed">{alert.explanation}</p>
+      <MarkdownRenderer content={alert.explanation} />
 
       {/* Verifiable Evidence */}
       {alert.evidence && alert.evidence.length > 0 && (
@@ -99,7 +100,9 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
           </div>
           <ul className="space-y-1 pl-3 text-zinc-300 list-disc">
             {alert.evidence.map((ev, i) => (
-              <li key={i}>{typeof ev === "string" ? ev : JSON.stringify(ev)}</li>
+              <li key={i}>
+                <MarkdownRenderer content={typeof ev === "string" ? ev : JSON.stringify(ev)} compact />
+              </li>
             ))}
           </ul>
         </div>

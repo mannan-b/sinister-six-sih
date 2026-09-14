@@ -8,6 +8,7 @@ import { fetchEntityProfile } from "@/lib/api/entities";
 import { RiskBadge } from "@/components/common/RiskBadge";
 import { EntityBadge } from "@/components/common/EntityBadge";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 interface EntityPanelProps {
   entityId: string | null;
@@ -108,7 +109,9 @@ export function EntityPanel({ entityId, onClose }: EntityPanelProps) {
                   {profile.risk_reasons.map((reason, idx) => (
                     <li key={idx} className="flex items-start gap-1.5 break-words">
                       <span className="text-zinc-400 shrink-0">•</span>
-                      <span className="break-words leading-relaxed">{reason}</span>
+                      <div className="flex-1 min-w-0">
+                        <MarkdownRenderer content={reason} compact />
+                      </div>
                     </li>
                   ))}
                 </ul>
