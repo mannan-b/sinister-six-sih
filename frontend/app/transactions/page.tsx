@@ -45,37 +45,37 @@ export default function TransactionsPage() {
   }, [activeCaseId, anomalyOnly, searchAccount]);
 
   return (
-    <div className="space-y-4 font-mono select-none">
+    <div className="space-y-4 select-none">
       {/* Header & Controls */}
-      <div className="p-4 rounded-lg bg-surface border border-border flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-4 rounded-lg bg-black border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h1 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <ArrowLeftRight className="w-4 h-4 text-purple-400" />
+            <ArrowLeftRight className="w-4 h-4 text-zinc-300" />
             <span>Financial Transactions & Fund Traces</span>
           </h1>
-          <p className="text-[11px] text-slate-400 mt-0.5">
+          <p className="text-[11px] text-zinc-400 mt-0.5">
             Banking ledgers evaluated with anomaly detection ({transactions.length} records)
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="relative w-48">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
             <input
               type="text"
               value={searchAccount}
               onChange={(e) => setSearchAccount(e.target.value)}
               placeholder="Search account..."
-              className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-white"
+              className="w-full pl-8 pr-3 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-white placeholder:text-zinc-500"
             />
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
             <input
               type="checkbox"
               checked={anomalyOnly}
               onChange={(e) => setAnomalyOnly(e.target.checked)}
-              className="rounded bg-surface-raised border-border text-nexus-600 focus:ring-0"
+              className="rounded bg-zinc-900 border-zinc-800 text-white focus:ring-0"
             />
             <span>Anomalies Only</span>
           </label>
@@ -83,7 +83,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Transactions Table */}
-      <div className="rounded-lg bg-surface border border-border overflow-hidden">
+      <div className="rounded-lg bg-black border border-zinc-800 overflow-hidden">
         {loading ? (
           <div className="p-8">
             <LoadingSkeleton text="Loading transaction records..." />
@@ -108,7 +108,7 @@ export default function TransactionsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-raised/80 border-b border-border text-[10px] text-slate-400 uppercase tracking-wider">
+              <thead className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
                 <tr>
                   <th className="px-4 py-3">Timestamp</th>
                   <th className="px-4 py-3">Sender Account</th>
@@ -118,15 +118,15 @@ export default function TransactionsPage() {
                   <th className="px-4 py-3">Detection Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="divide-y divide-zinc-800">
                 {transactions.map((t) => (
                   <tr
                     key={t.id}
-                    className={`hover:bg-surface-hover/70 transition-colors ${
+                    className={`hover:bg-zinc-900 transition-colors ${
                       t.is_anomalous ? "bg-red-950/20" : ""
                     }`}
                   >
-                    <td className="px-4 py-3 text-slate-400 text-[11px]">
+                    <td className="px-4 py-3 text-zinc-400 text-[11px]">
                       {new Date(t.timestamp).toLocaleString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -136,29 +136,29 @@ export default function TransactionsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-bold text-white">{t.sender_account}</div>
-                      {t.sender_name && <div className="text-[10px] text-slate-500">{t.sender_name}</div>}
+                      {t.sender_name && <div className="text-[10px] text-zinc-400">{t.sender_name}</div>}
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-bold text-white">{t.receiver_account}</div>
-                      {t.receiver_name && <div className="text-[10px] text-slate-500">{t.receiver_name}</div>}
+                      {t.receiver_name && <div className="text-[10px] text-zinc-400">{t.receiver_name}</div>}
                     </td>
                     <td className="px-4 py-3 font-semibold text-white">
                       ₹{t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3">
                       {t.is_anomalous ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 border border-red-700 text-red-300">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-300">
                           <AlertTriangle className="w-3 h-3" />
                           ANOMALOUS
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-emerald-950 border border-emerald-800 text-emerald-400">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-400">
                           <ShieldCheck className="w-3 h-3" />
                           NORMAL
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-[11px] text-slate-400 max-w-xs truncate">
+                    <td className="px-4 py-3 text-[11px] text-zinc-400 max-w-xs truncate">
                       {t.anomaly_reason || "Within expected transaction bounds"}
                     </td>
                   </tr>

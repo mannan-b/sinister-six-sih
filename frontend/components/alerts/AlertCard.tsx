@@ -31,7 +31,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
   }
 
   return (
-    <div className="p-4 rounded-lg bg-surface border border-border hover:border-nexus-600/70 transition-all space-y-3 font-mono text-xs select-none">
+    <div className="p-4 rounded-lg bg-black border border-zinc-800 hover:border-zinc-700 transition-all space-y-3 text-xs select-none">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
@@ -46,7 +46,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
                 ? "bg-sky-950/80 border-sky-700 text-sky-300"
                 : alert.category === "SELF_DRIVEN_TRANSIT"
                 ? "bg-amber-950/80 border-amber-700 text-amber-300"
-                : "bg-slate-900 border-slate-800 text-slate-400"
+                : "bg-zinc-900 border-zinc-800 text-zinc-400"
             }`}>
               {alert.category.replace(/_/g, " ")}
             </span>
@@ -56,7 +56,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
                   ? "bg-blue-950 text-blue-400 border border-blue-800"
                   : alert.status === "REVIEWED"
                   ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
-                  : "bg-slate-900 text-slate-500"
+                  : "bg-zinc-900 text-zinc-500"
               }`}
             >
               {alert.status}
@@ -69,7 +69,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
           {alert.entity_id && (
             <button
               onClick={() => router.push(`/explorer?highlight=${alert.entity_id}`)}
-              className="px-2.5 py-1 rounded bg-surface-raised border border-border hover:border-nexus-500 text-[10px] text-nexus-300 flex items-center gap-1 transition-colors"
+              className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-[10px] text-zinc-300 flex items-center gap-1 transition-colors"
             >
               <span>View in Graph</span>
               <ArrowRight className="w-3 h-3" />
@@ -80,7 +80,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
               sessionStorage.setItem("assistantContext", JSON.stringify({ type: "alert", data: alert }));
               router.push(`/cases/${alert.case_id}/assistant`);
             }}
-            className="px-2.5 py-1 rounded bg-nexus-600 hover:bg-nexus-500 text-[10px] text-white flex items-center gap-1 transition-colors shadow-sm"
+            className="px-2.5 py-1 rounded bg-white hover:bg-zinc-200 text-[10px] font-semibold text-black flex items-center gap-1 transition-colors shadow-sm"
           >
             <span>Ask AI Copilot</span>
           </button>
@@ -88,16 +88,16 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
       </div>
 
       {/* Explanation */}
-      <p className="text-slate-300 text-xs leading-relaxed">{alert.explanation}</p>
+      <p className="text-zinc-300 text-xs leading-relaxed">{alert.explanation}</p>
 
       {/* Verifiable Evidence */}
       {alert.evidence && alert.evidence.length > 0 && (
-        <div className="p-2.5 rounded bg-surface-raised border border-border/70 text-[11px] space-y-1">
-          <div className="flex items-center gap-1 text-[10px] text-slate-400 font-semibold">
-            <FileText className="w-3 h-3 text-nexus-400" />
+        <div className="p-2.5 rounded bg-zinc-900 border border-zinc-800/70 text-[11px] space-y-1">
+          <div className="flex items-center gap-1 text-[10px] text-zinc-400 font-semibold">
+            <FileText className="w-3 h-3 text-zinc-300" />
             <span>SUPPORTING EVIDENCE ({alert.evidence.length})</span>
           </div>
-          <ul className="space-y-1 pl-3 text-slate-300 list-disc">
+          <ul className="space-y-1 pl-3 text-zinc-300 list-disc">
             {alert.evidence.map((ev, i) => (
               <li key={i}>{typeof ev === "string" ? ev : JSON.stringify(ev)}</li>
             ))}
@@ -106,7 +106,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
       )}
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-border/50 text-[10px] text-slate-400">
+      <div className="flex items-center justify-between pt-2 border-t border-zinc-800/50 text-[10px] text-zinc-400">
         <span>Confidence: {(alert.confidence * 100).toFixed(0)}%</span>
 
         <div className="flex items-center gap-2">
@@ -123,7 +123,7 @@ export function AlertCard({ alert, onStatusChange }: AlertCardProps) {
           {alert.status !== "DISMISSED" && (
             <button
               onClick={() => handleStatus("DISMISSED")}
-              className="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-400 flex items-center gap-1 transition-colors"
+              className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 flex items-center gap-1 transition-colors"
             >
               <EyeOff className="w-3 h-3" />
               <span>Dismiss</span>

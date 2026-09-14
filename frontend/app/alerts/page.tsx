@@ -51,15 +51,15 @@ export default function AlertsPage() {
   }, [activeCaseId, severityFilter, categoryFilter, statusFilter]);
 
   return (
-    <div className="space-y-4 font-mono select-none">
+    <div className="space-y-4 select-none">
       {/* Header & Filter Controls */}
-      <div className="p-4 rounded-lg bg-surface border border-border flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-4 rounded-lg bg-black border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h1 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-red-400" />
             <span>Risk Indicators & Anomaly Alert Engine</span>
           </h1>
-          <p className="text-[11px] text-slate-400 mt-0.5">
+          <p className="text-[11px] text-zinc-400 mt-0.5">
             Automated alerts backed by anomaly detection and graph topology ({alerts.length} alerts)
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function AlertsPage() {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
+            className="px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-zinc-200"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -82,7 +82,7 @@ export default function AlertsPage() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
+            className="px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-zinc-200"
           >
             <option value="ALL">All Categories</option>
             <option value="FINANCIAL">Financial</option>
@@ -95,7 +95,7 @@ export default function AlertsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
+            className="px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-zinc-200"
           >
             <option value="ALL">All Statuses</option>
             <option value="NEW">New</option>

@@ -45,37 +45,37 @@ export default function CommunicationsPage() {
   }, [activeCaseId, anomalyOnly, searchPhone]);
 
   return (
-    <div className="space-y-4 font-mono select-none">
+    <div className="space-y-4 select-none">
       {/* Header & Controls */}
-      <div className="p-4 rounded-lg bg-surface border border-border flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-4 rounded-lg bg-black border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h1 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <PhoneCall className="w-4 h-4 text-cyan-400" />
+            <PhoneCall className="w-4 h-4 text-zinc-300" />
             <span>Call Detail Records (CDR) & Communication Bursts</span>
           </h1>
-          <p className="text-[11px] text-slate-400 mt-0.5">
+          <p className="text-[11px] text-zinc-400 mt-0.5">
             Communication frequency, duration analysis, and burst detection ({comms.length} records)
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="relative w-48">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
             <input
               type="text"
               value={searchPhone}
               onChange={(e) => setSearchPhone(e.target.value)}
               placeholder="Search phone number..."
-              className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-white"
+              className="w-full pl-8 pr-3 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-white placeholder:text-zinc-500"
             />
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
             <input
               type="checkbox"
               checked={anomalyOnly}
               onChange={(e) => setAnomalyOnly(e.target.checked)}
-              className="rounded bg-surface-raised border-border text-nexus-600 focus:ring-0"
+              className="rounded bg-zinc-900 border-zinc-800 text-white focus:ring-0"
             />
             <span>Anomalies Only</span>
           </label>
@@ -83,7 +83,7 @@ export default function CommunicationsPage() {
       </div>
 
       {/* Communications Table */}
-      <div className="rounded-lg bg-surface border border-border overflow-hidden">
+      <div className="rounded-lg bg-black border border-zinc-800 overflow-hidden">
         {loading ? (
           <div className="p-8">
             <LoadingSkeleton text="Loading CDR communications..." />
@@ -108,7 +108,7 @@ export default function CommunicationsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-raised/80 border-b border-border text-[10px] text-slate-400 uppercase tracking-wider">
+              <thead className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
                 <tr>
                   <th className="px-4 py-3">Timestamp</th>
                   <th className="px-4 py-3">Caller</th>
@@ -119,15 +119,15 @@ export default function CommunicationsPage() {
                   <th className="px-4 py-3">Detection Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="divide-y divide-zinc-800">
                 {comms.map((c) => (
                   <tr
                     key={c.id}
-                    className={`hover:bg-surface-hover/70 transition-colors ${
+                    className={`hover:bg-zinc-900 transition-colors ${
                       c.is_anomalous ? "bg-red-950/20" : ""
                     }`}
                   >
-                    <td className="px-4 py-3 text-slate-400 text-[11px]">
+                    <td className="px-4 py-3 text-zinc-400 text-[11px]">
                       {new Date(c.timestamp).toLocaleString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -138,20 +138,20 @@ export default function CommunicationsPage() {
                     <td className="px-4 py-3">
                       <div className="font-bold text-white">{c.caller_phone}</div>
                       {c.caller_name && c.caller_name !== c.caller_phone && (
-                        <div className="text-[10px] text-slate-500">{c.caller_name}</div>
+                        <div className="text-[10px] text-zinc-400">{c.caller_name}</div>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-bold text-white">{c.receiver_phone}</div>
                       {c.receiver_name && c.receiver_name !== c.receiver_phone && (
-                        <div className="text-[10px] text-slate-500">{c.receiver_name}</div>
+                        <div className="text-[10px] text-zinc-400">{c.receiver_name}</div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-300">
+                    <td className="px-4 py-3 text-zinc-300">
                       {Math.floor(c.duration_seconds / 60)}m {c.duration_seconds % 60}s
                     </td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-300">
+                      <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300">
                         {c.communication_type}
                       </span>
                     </td>
@@ -168,7 +168,7 @@ export default function CommunicationsPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-[11px] text-slate-400 max-w-xs truncate">
+                    <td className="px-4 py-3 text-[11px] text-zinc-400 max-w-xs truncate">
                       {c.anomaly_reason || "Within baseline call parameters"}
                     </td>
                   </tr>

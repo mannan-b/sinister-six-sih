@@ -10,41 +10,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#070b13",
-        surface: "#0c121e",
-        "surface-raised": "#121b2c",
-        "surface-hover": "#1a263e",
-        border: "#1f2e4a",
-        "border-subtle": "#162238",
+        background: "#000000",
+        surface: "#050505",
+        "surface-raised": "#121212",
+        "surface-hover": "#18181b",
+        border: "#27272a",
+        "border-subtle": "#18181b",
         
         nexus: {
-          50: "#f0f7ff",
-          100: "#e0effe",
-          200: "#bae0fd",
-          300: "#7cc5fb",
-          400: "#38a5f6",
-          500: "#0e87ea",
-          600: "#0269c7",
-          700: "#0354a1",
-          800: "#074785",
-          900: "#0c3b6e",
-          950: "#072448",
+          50: "#ffffff",
+          100: "#f4f4f5",
+          200: "#e4e4e7",
+          300: "#d4d4d8",
+          400: "#a1a1aa",
+          500: "#71717a",
+          600: "#52525b",
+          700: "#3f3f46",
+          800: "#27272a",
+          900: "#18181b",
+          950: "#09090b",
         },
         
-        // Security / Risk palette
+        // Monochrome Risk palette
         risk: {
-          low: "#10b981",
-          moderate: "#f59e0b",
-          high: "#f97316",
-          critical: "#ef4444",
+          low: "#71717a",
+          moderate: "#a1a1aa",
+          high: "#e4e4e7",
+          critical: "#ffffff",
         }
       },
-      fontFamily: {
-        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "monospace"],
-      },
       boxShadow: {
-        glow: "0 0 20px -5px rgba(14, 135, 234, 0.3)",
-        "glow-red": "0 0 20px -5px rgba(239, 68, 68, 0.3)",
+        glow: "0 0 20px -5px rgba(255, 255, 255, 0.1)",
       }
     },
   },
