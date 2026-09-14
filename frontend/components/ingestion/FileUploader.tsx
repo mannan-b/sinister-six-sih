@@ -48,9 +48,9 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
   };
 
   return (
-    <div className="p-6 rounded-lg bg-surface border border-border space-y-5 font-mono text-xs select-none">
+    <div className="p-6 rounded-lg bg-black border border-zinc-800 space-y-5 text-xs select-none">
       {/* Tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-border/80 pb-3">
+      <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
         <button
           onClick={() => {
             setActiveTab("DOC");
@@ -59,8 +59,8 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
           }}
           className={`flex items-center gap-2 px-3 py-2 rounded-md font-semibold transition-colors ${
             activeTab === "DOC"
-              ? "bg-nexus-900/60 border border-nexus-600 text-nexus-300"
-              : "text-slate-400 hover:text-white"
+              ? "bg-zinc-900 border border-zinc-700 text-white"
+              : "text-zinc-400 hover:text-white"
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -75,8 +75,8 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
           }}
           className={`flex items-center gap-2 px-3 py-2 rounded-md font-semibold transition-colors ${
             activeTab === "CDR"
-              ? "bg-cyan-950/60 border border-cyan-600 text-cyan-300"
-              : "text-slate-400 hover:text-white"
+              ? "bg-zinc-900 border border-zinc-700 text-white"
+              : "text-zinc-400 hover:text-white"
           }`}
         >
           <PhoneCall className="w-4 h-4" />
@@ -91,8 +91,8 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
           }}
           className={`flex items-center gap-2 px-3 py-2 rounded-md font-semibold transition-colors ${
             activeTab === "TX"
-              ? "bg-purple-950/60 border border-purple-600 text-purple-300"
-              : "text-slate-400 hover:text-white"
+              ? "bg-zinc-900 border border-zinc-700 text-white"
+              : "text-zinc-400 hover:text-white"
           }`}
         >
           <ArrowLeftRight className="w-4 h-4" />
@@ -105,7 +105,7 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
         {activeTab === "DOC" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] text-slate-400 uppercase block mb-1">
+              <label className="text-[10px] text-zinc-400 uppercase block mb-1">
                 Document Title
               </label>
               <input
@@ -113,17 +113,17 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
                 value={docTitle}
                 onChange={(e) => setDocTitle(e.target.value)}
                 placeholder="e.g. FIR-1023/2026/CRIME-BRANCH"
-                className="w-full px-3 py-2 rounded bg-surface-raised border border-border text-xs text-white"
+                className="w-full px-3 py-2 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-white placeholder:text-zinc-500"
               />
             </div>
             <div>
-              <label className="text-[10px] text-slate-400 uppercase block mb-1">
+              <label className="text-[10px] text-zinc-400 uppercase block mb-1">
                 Document Category
               </label>
               <select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
-                className="w-full px-3 py-2 rounded bg-surface-raised border border-border text-xs text-slate-200"
+                className="w-full px-3 py-2 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-zinc-200"
               >
                 <option value="FIR">First Information Report (FIR)</option>
                 <option value="SURVEILLANCE">Surveillance Report</option>
@@ -134,12 +134,12 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
         )}
 
         {/* Dropzone Container */}
-        <div className="border-2 border-dashed border-border/80 hover:border-nexus-500/80 rounded-lg p-6 bg-surface-raised/40 flex flex-col items-center justify-center text-center transition-colors">
-          <Upload className="w-8 h-8 text-nexus-400 mb-2 opacity-80" />
-          <p className="text-xs text-slate-300 font-medium">
+        <div className="border-2 border-dashed border-zinc-800 hover:border-zinc-700 rounded-lg p-6 bg-zinc-950 flex flex-col items-center justify-center text-center transition-colors">
+          <Upload className="w-8 h-8 text-zinc-400 mb-2 opacity-80" />
+          <p className="text-xs text-zinc-300 font-medium">
             {selectedFile ? selectedFile.name : "Select or drag file to ingest"}
           </p>
-          <p className="text-[10px] text-slate-400 mt-1">
+          <p className="text-[10px] text-zinc-400 mt-1">
             {activeTab === "DOC"
               ? "Supported formats: .txt, .pdf, .docx"
               : "Required CSV with headers: caller, receiver, date, duration or sender, receiver, amount"}
@@ -147,7 +147,7 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
           <input
             type="file"
             onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-            className="mt-3 text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-nexus-700 file:text-white hover:file:bg-nexus-600 cursor-pointer"
+            className="mt-3 text-xs text-zinc-400 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-zinc-200 cursor-pointer"
           />
         </div>
 
@@ -171,12 +171,12 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
             </p>
             {uploadResult.entities_extracted !== undefined && (
               <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
-                <div className="p-2 rounded bg-surface border border-emerald-800/60">
-                  <span className="text-slate-400">Entities Extracted:</span>{" "}
+                <div className="p-2 rounded bg-black border border-emerald-800/60">
+                  <span className="text-zinc-400">Entities Extracted:</span>{" "}
                   <strong className="text-white">{uploadResult.entities_extracted}</strong>
                 </div>
-                <div className="p-2 rounded bg-surface border border-emerald-800/60">
-                  <span className="text-slate-400">Relationships Extracted:</span>{" "}
+                <div className="p-2 rounded bg-black border border-emerald-800/60">
+                  <span className="text-zinc-400">Relationships Extracted:</span>{" "}
                   <strong className="text-white">{uploadResult.relationships_extracted}</strong>
                 </div>
               </div>
@@ -188,7 +188,7 @@ export function FileUploader({ caseId, onUploadSuccess }: FileUploaderProps) {
         <button
           type="submit"
           disabled={!selectedFile || isUploading}
-          className="w-full py-2.5 rounded bg-nexus-600 hover:bg-nexus-500 disabled:opacity-50 text-white font-bold flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-2.5 rounded bg-white hover:bg-zinc-200 disabled:opacity-50 text-black font-bold flex items-center justify-center gap-2 transition-colors"
         >
           {isUploading ? (
             <>

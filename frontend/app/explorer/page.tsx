@@ -65,7 +65,7 @@ function ExplorerContent({ currentCaseId }: { currentCaseId?: string }) {
 
   if (!graphData || graphData.nodes.length === 0) {
     return (
-      <div className="h-[calc(100vh-7rem)] flex items-center justify-center font-mono">
+      <div className="h-[calc(100vh-7rem)] flex items-center justify-center">
         <div className="w-full max-w-lg">
           <EmptyState
             title="No Knowledge Graph Data"
@@ -79,7 +79,7 @@ function ExplorerContent({ currentCaseId }: { currentCaseId?: string }) {
   }
 
   return (
-    <div className="relative h-[calc(100vh-7rem)] w-full rounded-lg border border-border overflow-hidden flex font-mono">
+    <div className="relative h-[calc(100vh-7rem)] w-full rounded-lg border border-zinc-800 bg-black overflow-hidden flex">
       {/* Cytoscape Graph Canvas */}
       <div className="flex-1 h-full relative">
         <GraphViewer

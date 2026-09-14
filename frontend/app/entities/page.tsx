@@ -51,16 +51,16 @@ export default function EntitiesPage() {
   }, [activeCaseId, typeFilter, minRisk, search]);
 
   return (
-    <div className="space-y-4 font-mono select-none">
+    <div className="space-y-4 select-none">
       <div className="space-y-4">
         {/* Header & Filter Controls */}
-        <div className="p-4 rounded-lg bg-surface border border-border flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="p-4 rounded-lg bg-black border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Users className="w-4 h-4 text-nexus-400" />
-              <span>Entity Intelligence Directory</span>
+              <Users className="w-4 h-4 text-zinc-300" />
+              <span>Entity Directory</span>
             </h1>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-zinc-400 mt-0.5">
               Extracted persons, identifiers, locations, and financial instruments ({entities.length} records)
             </p>
           </div>
@@ -68,13 +68,13 @@ export default function EntitiesPage() {
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {/* Search Input */}
             <div className="relative w-48">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Filter entities..."
-                className="w-full pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-white"
+                className="w-full pl-8 pr-3 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-white placeholder:text-zinc-500"
               />
             </div>
 
@@ -82,7 +82,7 @@ export default function EntitiesPage() {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
+              className="px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-zinc-200"
             >
               <option value="ALL">All Types</option>
               <option value="PERSON">Persons</option>
@@ -96,7 +96,7 @@ export default function EntitiesPage() {
             <select
               value={minRisk}
               onChange={(e) => setMinRisk(Number(e.target.value))}
-              className="px-2.5 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs text-slate-200"
+              className="px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-zinc-200"
             >
               <option value="0">All Risk Levels</option>
               <option value="40">Moderate (&gt;= 40)</option>
@@ -107,7 +107,7 @@ export default function EntitiesPage() {
         </div>
 
         {/* Entities Table */}
-        <div className="rounded-lg bg-surface border border-border overflow-hidden">
+        <div className="rounded-lg bg-black border border-zinc-800 overflow-hidden">
           {loading ? (
             <div className="p-8">
               <LoadingSkeleton text="Loading entities..." />
@@ -132,7 +132,7 @@ export default function EntitiesPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-raised/80 border-b border-border text-[10px] text-slate-400 uppercase tracking-wider">
+                <thead className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3">Subject / Identifier</th>
                     <th className="px-4 py-3">Type</th>
@@ -143,19 +143,19 @@ export default function EntitiesPage() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/50">
+                <tbody className="divide-y divide-zinc-800">
                   {entities.map((entity) => (
                     <tr
                       key={entity.id}
                       onClick={() => setSelectedEntityId(entity.id)}
-                      className={`hover:bg-surface-hover/70 cursor-pointer transition-colors ${
-                        selectedEntityId === entity.id ? "bg-nexus-950/40" : ""
+                      className={`hover:bg-zinc-900 cursor-pointer transition-colors ${
+                        selectedEntityId === entity.id ? "bg-zinc-900" : ""
                       }`}
                     >
                       <td className="px-4 py-3">
                         <div className="font-bold text-white">{entity.display_name}</div>
                         {entity.aliases && entity.aliases.length > 0 && (
-                          <div className="text-[10px] text-slate-500 truncate max-w-xs">
+                          <div className="text-[10px] text-zinc-400 truncate max-w-xs">
                             Aliases: {entity.aliases.join(", ")}
                           </div>
                         )}
@@ -166,14 +166,14 @@ export default function EntitiesPage() {
                       <td className="px-4 py-3">
                         <RiskBadge level={entity.risk_level} score={entity.risk_score} />
                       </td>
-                      <td className="px-4 py-3 text-slate-400 text-[11px]">
+                      <td className="px-4 py-3 text-zinc-400 text-[11px]">
                         {entity.betweenness_centrality?.toFixed(4) || "0.0000"}
                       </td>
-                      <td className="px-4 py-3 text-slate-400 text-[11px]">
+                      <td className="px-4 py-3 text-zinc-400 text-[11px]">
                         {entity.pagerank_score?.toFixed(4) || "0.0000"}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
                           Cluster {entity.community_id || 0}
                         </span>
                       </td>
@@ -183,7 +183,7 @@ export default function EntitiesPage() {
                             e.stopPropagation();
                             setSelectedEntityId(entity.id);
                           }}
-                          className="p-1 rounded hover:bg-surface-raised text-slate-400 hover:text-nexus-300 transition-colors"
+                          className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
                           title="View Entity Profile"
                         >
                           <Eye className="w-3.5 h-3.5" />

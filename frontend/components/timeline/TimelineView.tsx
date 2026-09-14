@@ -23,19 +23,19 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
   });
 
   return (
-    <div className="space-y-4 font-mono select-none">
+    <div className="space-y-4 select-none">
       {/* Filter Bar */}
-      <div className="flex items-center justify-between bg-surface border border-border p-3 rounded-lg text-xs">
+      <div className="flex items-center justify-between bg-black border border-zinc-800 p-3 rounded-lg text-xs">
         <div className="flex items-center gap-2">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-slate-300 font-semibold">Filter Events:</span>
+          <Filter className="w-3.5 h-3.5 text-zinc-400" />
+          <span className="text-zinc-300 font-semibold">Filter Events:</span>
         </div>
 
         <div className="flex items-center gap-2">
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-2.5 py-1 rounded bg-surface-raised border border-border text-xs text-slate-200"
+            className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"
           >
             <option value="ALL">All Event Types</option>
             <option value="MEETING">Meetings</option>
@@ -48,7 +48,7 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
           <select
             value={selectedSeverity}
             onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="px-2.5 py-1 rounded bg-surface-raised border border-border text-xs text-slate-200"
+            className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -59,10 +59,10 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
       </div>
 
       {/* Timeline Stream */}
-      <div className="relative border-l-2 border-border/80 ml-4 space-y-6 py-2">
+      <div className="relative border-l-2 border-zinc-800 ml-4 space-y-6 py-2">
         {filteredEvents.map((ev, idx) => {
           let dotColor = "bg-blue-500 border-blue-300";
-          let badgeStyle = "bg-blue-950 text-blue-400 border-blue-800";
+          let badgeStyle = "bg-zinc-900 text-zinc-300 border-zinc-700";
 
           if (ev.severity === "CRITICAL") {
             dotColor = "bg-red-500 border-red-300 animate-pulse";
@@ -88,21 +88,21 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
               />
 
               {/* Event Card */}
-              <div className="p-4 rounded-lg bg-surface border border-border hover:border-nexus-600 transition-colors space-y-2.5">
+              <div className="p-4 rounded-lg bg-black border border-zinc-800 hover:border-zinc-700 transition-colors space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-white">{ev.title}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${badgeStyle}`}>
+                    <span className={`px-2 py-0.5 rounded text-[10px] border ${badgeStyle}`}>
                       {ev.event_type}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{dateStr}</span>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed">{ev.description}</p>
+                <p className="text-xs text-zinc-300 leading-relaxed">{ev.description}</p>
 
                 {ev.location_name && (
                   <div className="flex items-center gap-1.5 text-[11px] text-emerald-400">
@@ -113,8 +113,8 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
 
                 {/* Involved Entities */}
                 {ev.involved_entities && ev.involved_entities.length > 0 && (
-                  <div className="pt-2 border-t border-border/50 flex flex-wrap items-center gap-1.5 text-[10px]">
-                    <span className="text-slate-400">Involved Subjects:</span>
+                  <div className="pt-2 border-t border-zinc-800/80 flex flex-wrap items-center gap-1.5 text-[10px]">
+                    <span className="text-zinc-400">Involved Subjects:</span>
                     {ev.involved_entities.map((ent) => (
                       <button
                         key={ent.id}
@@ -122,7 +122,7 @@ export function TimelineView({ events, onSelectEntity }: TimelineViewProps) {
                           if (onSelectEntity) onSelectEntity(ent.id);
                           else router.push(`/explorer?highlight=${ent.id}`);
                         }}
-                        className="px-2 py-0.5 rounded bg-surface-raised border border-border hover:border-nexus-500 text-slate-200 hover:text-nexus-300 transition-colors"
+                        className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-600 text-zinc-200 hover:text-white transition-colors"
                       >
                         <span>{ent.name}</span>
                         <span className="text-orange-400 ml-1">({ent.risk_score})</span>

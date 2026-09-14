@@ -205,519 +205,1175 @@ export default function CasesPage() {
     }
   };
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-6 font-mono select-none pb-12">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-20 right-8 z-50 bg-surface-raised border border-nexus-500/80 shadow-2xl p-4 rounded-lg flex items-center gap-4 text-xs animate-in slide-in-from-top-2 duration-200">
-          <CheckCircle2 className="w-5 h-5 text-nexus-400 shrink-0" />
-          <div>
-            <p className="text-white font-semibold">{toastMessage.text}</p>
+
+  
+
+return (
+  <div className="min-h-full bg-[#050505] text-neutral-200 font-sans select-none pb-12">
+
+    {/* TOAST */}
+    {toastMessage && (
+      <div className="fixed top-20 right-6 z-50 w-[360px] bg-[#111214] border border-[#2a2a2d] shadow-2xl rounded-md">
+        <div className="flex items-start gap-3 p-4">
+          <div className="mt-0.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-neutral-100">
+              {toastMessage.text}
+            </p>
+
             {toastMessage.caseId && (
               <button
-                onClick={() => router.push(`/cases/${toastMessage.caseId}`)}
-                className="text-nexus-400 hover:text-nexus-300 font-bold underline mt-1 flex items-center gap-1"
+                onClick={() =>
+                  router.push(`/cases/${toastMessage.caseId}`)
+                }
+                className="mt-2 text-xs text-neutral-300 hover:text-white transition-colors flex items-center gap-1"
               >
-                <span>Open Investigation Now</span>
+                Open investigation
                 <ArrowRight className="w-3 h-3" />
               </button>
             )}
           </div>
+
           <button
             onClick={() => setToastMessage(null)}
-            className="text-slate-400 hover:text-white ml-2"
+            className="text-neutral-600 hover:text-neutral-200 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
-      )}
+      </div>
+    )}
 
-      {/* Header Banner */}
-      <div className="bg-surface rounded-lg border border-border p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    {/* PAGE HEADER */}
+    <div className="max-w-[1500px] mx-auto px-6 lg:px-8 pt-7">
+
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-[#202124]">
+
         <div>
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-nexus-950 border border-nexus-800 text-nexus-400">
-              <Shield className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-nexus-400 uppercase tracking-widest">NEXUS</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">
-                  INVESTIGATIONS PORTAL
-                </span>
-              </div>
-              <h1 className="text-xl font-bold text-white tracking-tight">Active Case Files</h1>
-            </div>
+          {/* Breadcrumb / Context */}
+          <div className="flex items-center gap-2 mb-3 text-[11px] uppercase tracking-[0.14em]">
+            <span className="text-white font-semibold">
+              NEXUS
+            </span>
+
+            <span className="text-neutral-700">/</span>
+
+            <span className="text-neutral-500">
+              Investigations
+            </span>
           </div>
-          <p className="text-xs text-slate-400 mt-2 max-w-2xl leading-relaxed">
-            Select an investigation to continue intelligence synthesis, multi-modal knowledge graph
-            exploration, anomaly detection, and automated entity resolution.
-          </p>
+
+          <div className="flex items-center gap-4">
+
+            <div className="w-11 h-11 flex items-center justify-center rounded-md bg-[#121315] border border-[#2b2d31]">
+              <Shield className="w-5 h-5 text-neutral-200" />
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-white">
+                Investigation Cases
+              </h1>
+
+              <p className="mt-1 text-sm text-neutral-500 max-w-2xl">
+                Manage active investigations, case intelligence,
+                entities, relationships and analytical evidence.
+              </p>
+            </div>
+
+          </div>
         </div>
 
+        {/* New Case */}
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2.5 rounded bg-nexus-600 hover:bg-nexus-500 text-xs font-semibold text-white flex items-center gap-2 transition-colors shadow-glow shrink-0 self-start md:self-auto"
+          className="self-start lg:self-end inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-neutral-200 text-black text-sm font-medium rounded-md transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>+ New Case</span>
+          New investigation
         </button>
+
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-surface rounded-lg border border-border p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-96">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search cases by name, FIR number, officer..."
-            className="w-full pl-9 pr-4 py-1.5 rounded-md bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs font-mono text-slate-200 placeholder:text-slate-400 transition-colors"
-          />
-        </div>
+      {/* SEARCH / FILTER TOOLBAR */}
+      <div className="py-5">
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <span className="text-[11px] text-slate-400 font-medium mr-1">Status:</span>
-          {(["ALL", "ACTIVE", "CLOSED"] as const).map((st) => (
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+          {/* Search */}
+          <div className="relative w-full lg:max-w-md">
+
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600 pointer-events-none" />
+
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search investigations..."
+              className="
+                w-full
+                pl-10 pr-4 py-2.5
+                bg-[#0c0c0d]
+                border border-[#26272a]
+                rounded-md
+                text-sm text-neutral-200
+                placeholder:text-neutral-600
+                outline-none
+                focus:border-neutral-400
+                focus:ring-1
+                focus:ring-white/10
+                transition-all
+              "
+            />
+
+          </div>
+
+          {/* Filters */}
+          <div className="flex items-center gap-1">
+
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 mr-2">
+              Status
+            </span>
+
+            {(["ALL", "ACTIVE", "CLOSED"] as const).map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatusFilter(st)}
+                className={`
+                  px-3 py-1.5
+                  text-xs font-medium
+                  rounded-md
+                  border
+                  transition-colors
+                  ${
+                    statusFilter === st
+                      ? "bg-[#e5e5e5] border-[#e5e5e5] text-black"
+                      : "bg-transparent border-transparent text-neutral-500 hover:text-neutral-200 hover:bg-[#111214]"
+                  }
+                `}
+              >
+                {st === "ALL" ? "All cases" : st}
+              </button>
+            ))}
+
+            <div className="w-px h-5 bg-[#292a2d] mx-2" />
+
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1 rounded text-xs transition-colors ${
-                statusFilter === st
-                  ? "bg-nexus-900 text-nexus-300 border border-nexus-600/60 font-semibold"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-surface-raised"
-              }`}
+              onClick={loadCases}
+              className="
+                p-2
+                rounded-md
+                text-neutral-600
+                hover:text-neutral-200
+                hover:bg-[#111214]
+                transition-colors
+              "
+              title="Refresh cases"
             >
-              {st === "ALL" ? "All Cases" : st}
+              <RefreshCw className="w-4 h-4" />
             </button>
-          ))}
-          <button
-            onClick={loadCases}
-            className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-surface-raised ml-1"
-            title="Refresh Cases"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
+
+          </div>
         </div>
       </div>
 
-      {/* Cases List / Grid */}
+      {/* SECTION HEADER */}
+      <div className="flex items-center justify-between mb-4">
+
+        <div className="flex items-center gap-3">
+          <h2 className="text-sm font-semibold text-neutral-200">
+            Investigation files
+          </h2>
+
+          <span className="text-[11px] px-2 py-0.5 rounded bg-[#111214] border border-[#292a2d] text-neutral-500">
+            {cases.length}
+          </span>
+        </div>
+
+        <span className="text-[11px] text-neutral-600">
+          Select a case to access its intelligence workspace
+        </span>
+
+      </div>
+
+      {/* CASE CONTENT */}
       {loading ? (
-        <LoadingSkeleton text="Loading registered investigation dossiers..." />
+        <LoadingSkeleton text="Loading investigation files..." />
       ) : cases.length === 0 ? (
         <EmptyState
-          title="No Investigation Cases Found"
+          title="No investigation cases found"
           description={
             searchQuery
-              ? `No registered cases match search criteria "${searchQuery}".`
-              : "No investigation files registered under active status."
+              ? `No registered cases match "${searchQuery}".`
+              : "No investigation files are currently registered."
           }
           actionLabel="+ Create New Case"
           onAction={() => setShowCreateModal(true)}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 xl:grid-cols-2 gap-4">
+
           {cases.map((c) => {
+
             const fir = c.fir_number || c.case_number;
             const isClosed = c.status === "CLOSED";
+
             return (
               <div
                 key={c.id}
-                className={`rounded-lg border bg-surface flex flex-col justify-between transition-all hover:border-nexus-600/60 hover:shadow-lg ${
-                  isClosed ? "border-slate-800/80 opacity-75" : "border-border"
-                }`}
+                className={`
+                  group
+                  bg-[#0c0c0d]
+                  border
+                  ${isClosed ? "border-[#1d1e21]" : "border-[#28292c]"}
+                  rounded-md
+                  overflow-hidden
+                  transition-all
+                  hover:border-[#3a3b3f]
+                  ${isClosed ? "opacity-70" : ""}
+                `}
               >
-                {/* Card Header */}
-                <div className="p-5 space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <FolderGit2 className="w-4 h-4 text-nexus-400" />
-                        <h2 className="text-sm font-bold text-white tracking-tight hover:text-nexus-300 cursor-pointer" onClick={() => router.push(`/cases/${c.id}`)}>
-                          {c.name}
-                        </h2>
+
+                {/* CARD MAIN*/}
+                <div className="p-5">
+
+                  {/* Top row */}
+                  <div className="flex items-start justify-between gap-4">
+
+                    <div className="flex items-start gap-3 min-w-0">
+
+                      <div
+                        className="
+                          w-9 h-9
+                          flex items-center justify-center
+                          rounded-md
+                          bg-[#141517]
+                          border border-[#2b2d31]
+                          shrink-0
+                        "
+                      >
+                        <FolderGit2 className="w-4 h-4 text-neutral-200" />
                       </div>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[11px] text-nexus-300 font-mono">
-                        {fir}
-                      </span>
+
+                      <div className="min-w-0">
+
+                        <button
+                          onClick={() =>
+                            router.push(`/cases/${c.id}`)
+                          }
+                          className="
+                            text-left
+                            text-base
+                            font-semibold
+                            text-neutral-100
+                            hover:text-white
+                            transition-colors
+                            truncate
+                            max-w-full
+                          "
+                        >
+                          {c.name}
+                        </button>
+
+                        <div className="flex items-center gap-2 mt-1.5">
+
+                          <span className="text-[11px] text-neutral-500">
+                            {fir}
+                          </span>
+
+                          <span className="text-neutral-700">
+                            /
+                          </span>
+
+                          <span className="text-[11px] text-neutral-600">
+                            Case file
+                          </span>
+
+                        </div>
+
+                      </div>
+
                     </div>
 
+                    {/* Status */}
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${
-                        isClosed
-                          ? "bg-slate-900 border-slate-700 text-slate-400"
-                          : "bg-emerald-950/70 border-emerald-800 text-emerald-400"
-                      }`}
+                      className={`
+                        shrink-0
+                        px-2 py-1
+                        rounded
+                        text-[10px]
+                        font-semibold
+                        uppercase
+                        tracking-wider
+                        border
+                        ${
+                          isClosed
+                            ? "bg-[#121315] border-[#2b2d31] text-neutral-500"
+                            : " border-emerald-900/70 text-emerald-400"
+                        }
+                      `}
                     >
                       {c.status}
                     </span>
+
                   </div>
 
-                  <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                    {c.description || "No case description provided."}
+
+                  {/* Description */}
+                  <p className="mt-5 text-sm text-neutral-500 leading-relaxed line-clamp-2 min-h-[42px]">
+                    {c.description ||
+                      "No case description has been provided for this investigation."}
                   </p>
 
-                  {/* Metadata Rows */}
-                  <div className="pt-2 border-t border-border/60 space-y-1.5 text-[11px]">
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">{c.police_station || "Cyber Crime Cell"}</span>
+
+                  {/* =================================================
+                      CASE METADATA
+                  ================================================= */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5 pt-4 border-t border-[#202124]">
+
+                    <div className="flex items-start gap-2.5 min-w-0">
+
+                      <Building2 className="w-4 h-4 text-neutral-600 mt-0.5 shrink-0" />
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-wider text-neutral-600 mb-0.5">
+                          Jurisdiction
+                        </p>
+
+                        <p className="text-xs text-neutral-300 truncate">
+                          {c.police_station || "Cyber Crime Cell"}
+                        </p>
+                      </div>
+
                     </div>
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">
-                        {c.investigating_officer || "Investigating Officer"}
-                        {c.officer_rank && (
-                          <span className="text-slate-400 ml-1">({c.officer_rank})</span>
-                        )}
-                      </span>
+
+
+                    <div className="flex items-start gap-2.5 min-w-0">
+
+                      <User className="w-4 h-4 text-neutral-600 mt-0.5 shrink-0" />
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-wider text-neutral-600 mb-0.5">
+                          Investigating officer
+                        </p>
+
+                        <p className="text-xs text-neutral-300 truncate">
+                          {c.investigating_officer ||
+                            "Investigating Officer"}
+
+                          {c.officer_rank && (
+                            <span className="text-neutral-600 ml-1">
+                              · {c.officer_rank}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+
                     </div>
+
                   </div>
 
-                  {/* Counts Summary */}
-                  <div className="grid grid-cols-3 gap-2 pt-2 text-center text-[10px] font-mono">
-                    <div className="bg-surface-raised/80 p-2 rounded border border-border/40">
-                      <div className="font-bold text-white text-xs">{c.entity_count || 0}</div>
-                      <div className="text-slate-400">Entities</div>
+
+                  {/* =================================================
+                      INTELLIGENCE COUNTS
+                  ================================================= */}
+                  <div className="grid grid-cols-3 gap-px mt-5 bg-[#292a2d] border border-[#292a2d] rounded-md overflow-hidden">
+
+                    <div className="bg-[#101113] px-3 py-3">
+                      <p className="text-lg font-semibold text-neutral-100">
+                        {c.entity_count || 0}
+                      </p>
+
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-600 mt-0.5">
+                        Entities
+                      </p>
                     </div>
-                    <div className="bg-surface-raised/80 p-2 rounded border border-border/40">
-                      <div className="font-bold text-white text-xs">{c.relationship_count || 0}</div>
-                      <div className="text-slate-400">Links</div>
+
+                    <div className="bg-[#101113] px-3 py-3">
+                      <p className="text-lg font-semibold text-neutral-100">
+                        {c.relationship_count || 0}
+                      </p>
+
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-600 mt-0.5">
+                        Relationships
+                      </p>
                     </div>
-                    <div className="bg-surface-raised/80 p-2 rounded border border-border/40">
-                      <div className="font-bold text-white text-xs text-orange-400">{c.alert_count || 0}</div>
-                      <div className="text-slate-400">Alerts</div>
+
+                    <div className="bg-[#101113] px-3 py-3">
+                      <p
+                        className={`
+                          text-lg
+                          font-semibold
+                          ${
+                            (c.alert_count || 0) > 0
+                              ? "text-amber-400"
+                              : "text-neutral-100"
+                          }
+                        `}
+                      >
+                        {c.alert_count || 0}
+                      </p>
+
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-600 mt-0.5">
+                        Alerts
+                      </p>
                     </div>
+
                   </div>
+
                 </div>
 
-                {/* Card Actions Footer */}
-                <div className="px-5 py-3 bg-surface-raised/40 border-t border-border/60 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
+
+                {/* =================================================
+                    CARD FOOTER
+                ================================================= */}
+                <div className="flex items-center justify-between px-5 py-3 bg-[#090a0b] border-t border-[#202124]">
+
+                  <div className="flex items-center gap-1">
+
                     <button
                       onClick={() => openEditModal(c)}
-                      className="p-1.5 rounded hover:bg-surface-hover text-slate-400 hover:text-white transition-colors"
-                      title="Edit Case Details"
+                      className="
+                        p-2
+                        rounded-md
+                        text-neutral-600
+                        hover:text-neutral-200
+                        hover:bg-[#161719]
+                        transition-colors
+                      "
+                      title="Edit case details"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
+
                     <button
                       onClick={() => setClosingCase(c)}
-                      className="p-1.5 rounded hover:bg-surface-hover text-slate-400 hover:text-amber-400 transition-colors"
-                      title={isClosed ? "Reopen Case" : "Close Case"}
+                      className="
+                        p-2
+                        rounded-md
+                        text-neutral-600
+                        hover:text-amber-400
+                        hover:bg-[#17140d]
+                        transition-colors
+                      "
+                      title={
+                        isClosed
+                          ? "Reopen case"
+                          : "Close case"
+                      }
                     >
                       <Archive className="w-3.5 h-3.5" />
                     </button>
+
                   </div>
 
+
                   <button
-                    onClick={() => router.push(`/cases/${c.id}`)}
-                    className="px-3.5 py-1.5 rounded bg-nexus-600 hover:bg-nexus-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                    onClick={() =>
+                      router.push(`/cases/${c.id}`)
+                    }
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      px-3.5
+                      py-2
+                      bg-[#e5e5e5]
+                      hover:bg-white
+                      border border-[#e5e5e5]
+                      text-black
+                      text-xs
+                      font-medium
+                      rounded-md
+                      transition-colors
+                    "
                   >
-                    <span>Open Case</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    Open case
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
+
                 </div>
+
               </div>
             );
           })}
+
         </div>
       )}
 
-      {/* CREATE CASE MODAL */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-lg border border-border w-full max-w-lg shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <div className="flex items-center gap-2.5">
-                <FolderGit2 className="w-5 h-5 text-nexus-400" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Register New Investigation
-                </h3>
+    </div>
+
+    {/*  CREATE CASE MODAL */}
+    {showCreateModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+
+        <div className="w-full max-w-xl bg-[#0d0e10] border border-[#2b2d31] rounded-md shadow-2xl">
+
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#222427]">
+
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.15em] text-neutral-400 mb-1">
+                NEXUS / CASE MANAGEMENT
+              </p>
+
+              <h3 className="text-base font-semibold text-neutral-100">
+                Register new investigation
+              </h3>
+            </div>
+
+            <button
+              onClick={() => setShowCreateModal(false)}
+              className="p-2 text-neutral-600 hover:text-neutral-200 hover:bg-[#161719] rounded-md transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+          </div>
+
+
+          {/* Error */}
+          {createError && (
+            <div className="mx-6 mt-5 px-3 py-2.5 bg-[#241214] border border-red-900/70 rounded-md text-red-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{createError}</span>
+            </div>
+          )}
+
+
+          {/* Form */}
+          <form
+            onSubmit={handleCreateSubmit}
+            className="p-6 space-y-4"
+          >
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Case name
+                <span className="text-red-400 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                required
+                value={createForm.name}
+                onChange={(e) =>
+                  setCreateForm({
+                    ...createForm,
+                    name: e.target.value,
+                  })
+                }
+                placeholder="e.g. Operation Dark Eagle"
+                className="
+                  w-full
+                  px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  placeholder:text-neutral-700
+                  outline-none
+                  focus:border-neutral-400
+                  focus:ring-1
+                  focus:ring-white/10
+                "
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                FIR number
+                <span className="text-red-400 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                required
+                value={createForm.fir_number}
+                onChange={(e) =>
+                  setCreateForm({
+                    ...createForm,
+                    fir_number: e.target.value,
+                  })
+                }
+                placeholder="e.g. FIR-0452/2026"
+                className="
+                  w-full
+                  px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  placeholder:text-neutral-700
+                  outline-none
+                  focus:border-neutral-400
+                  focus:ring-1
+                  focus:ring-white/10
+                "
+              />
+            </div>
+
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                  Police station
+                </label>
+
+                <input
+                  type="text"
+                  value={createForm.police_station}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      police_station: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Cyber Crime Cell"
+                  className="
+                    w-full
+                    px-3 py-2.5
+                    bg-[#080909]
+                    border border-[#292a2d]
+                    rounded-md
+                    text-sm text-neutral-200
+                    placeholder:text-neutral-700
+                    outline-none
+                    focus:border-neutral-400
+                  "
+                />
               </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                  Officer rank
+                </label>
+
+                <input
+                  type="text"
+                  value={createForm.officer_rank}
+                  onChange={(e) =>
+                    setCreateForm({
+                      ...createForm,
+                      officer_rank: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Inspector"
+                  className="
+                    w-full
+                    px-3 py-2.5
+                    bg-[#080909]
+                    border border-[#292a2d]
+                    rounded-md
+                    text-sm text-neutral-200
+                    placeholder:text-neutral-700
+                    outline-none
+                    focus:border-neutral-400
+                  "
+                />
+              </div>
+
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Investigating officer
+              </label>
+
+              <input
+                type="text"
+                value={createForm.investigating_officer}
+                onChange={(e) =>
+                  setCreateForm({
+                    ...createForm,
+                    investigating_officer: e.target.value,
+                  })
+                }
+                placeholder="e.g. Inspector Rajesh Sharma"
+                className="
+                  w-full
+                  px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  placeholder:text-neutral-700
+                  outline-none
+                  focus:border-neutral-400
+                "
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Case description
+              </label>
+
+              <textarea
+                rows={4}
+                value={createForm.description}
+                onChange={(e) =>
+                  setCreateForm({
+                    ...createForm,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Provide scope, involved suspects, incident summary, or jurisdictional notes..."
+                className="
+                  w-full
+                  px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  placeholder:text-neutral-700
+                  outline-none
+                  focus:border-neutral-400
+                  resize-none
+                "
+              />
+            </div>
+
+
+            {/* Footer */}
+            <div className="flex justify-end gap-2 pt-4 border-t border-[#222427]">
+
               <button
+                type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="text-slate-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {createError && (
-              <div className="p-3 rounded bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{createError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleCreateSubmit} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Case Name <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={createForm.name}
-                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  placeholder="e.g., Operation Dark Eagle"
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  FIR Number <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={createForm.fir_number}
-                  onChange={(e) => setCreateForm({ ...createForm, fir_number: e.target.value })}
-                  placeholder="e.g., FIR-0452/2026"
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Police Station</label>
-                  <input
-                    type="text"
-                    value={createForm.police_station}
-                    onChange={(e) => setCreateForm({ ...createForm, police_station: e.target.value })}
-                    placeholder="e.g., Cyber Crime Cell"
-                    className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Officer Rank</label>
-                  <input
-                    type="text"
-                    value={createForm.officer_rank}
-                    onChange={(e) => setCreateForm({ ...createForm, officer_rank: e.target.value })}
-                    placeholder="e.g., Inspector"
-                    className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Investigating Officer</label>
-                <input
-                  type="text"
-                  value={createForm.investigating_officer}
-                  onChange={(e) =>
-                    setCreateForm({ ...createForm, investigating_officer: e.target.value })
-                  }
-                  placeholder="e.g., Inspector Rajesh Sharma"
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Case Description</label>
-                <textarea
-                  rows={3}
-                  value={createForm.description}
-                  onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
-                  placeholder="Provide scope, involved suspects, incident summary, or jurisdictional notes..."
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white resize-none"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-border flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded bg-surface-raised hover:bg-surface-hover border border-border text-slate-300 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 rounded bg-nexus-600 hover:bg-nexus-500 text-white font-semibold transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? "Registering Case..." : "Create Case"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* EDIT CASE MODAL */}
-      {editingCase && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-lg border border-border w-full max-w-lg shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <div className="flex items-center gap-2.5">
-                <Edit3 className="w-5 h-5 text-nexus-400" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Edit Investigation Details
-                </h3>
-              </div>
-              <button onClick={() => setEditingCase(null)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {editError && (
-              <div className="p-3 rounded bg-red-950/60 border border-red-800 text-red-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{editError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleEditSubmit} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Case Name <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  FIR Number <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editForm.fir_number}
-                  onChange={(e) => setEditForm({ ...editForm, fir_number: e.target.value })}
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Police Station</label>
-                  <input
-                    type="text"
-                    value={editForm.police_station}
-                    onChange={(e) => setEditForm({ ...editForm, police_station: e.target.value })}
-                    className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Officer Rank</label>
-                  <input
-                    type="text"
-                    value={editForm.officer_rank}
-                    onChange={(e) => setEditForm({ ...editForm, officer_rank: e.target.value })}
-                    className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Investigating Officer</label>
-                <input
-                  type="text"
-                  value={editForm.investigating_officer}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, investigating_officer: e.target.value })
-                  }
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Status</label>
-                <select
-                  value={editForm.status}
-                  onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white"
-                >
-                  <option value="ACTIVE">ACTIVE</option>
-                  <option value="CLOSED">CLOSED</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Case Description</label>
-                <textarea
-                  rows={3}
-                  value={editForm.description}
-                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                  className="w-full px-3 py-2 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-white resize-none"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-border flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setEditingCase(null)}
-                  className="px-4 py-2 rounded bg-surface-raised hover:bg-surface-hover border border-border text-slate-300 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isEditing}
-                  className="px-5 py-2 rounded bg-nexus-600 hover:bg-nexus-500 text-white font-semibold transition-colors disabled:opacity-50"
-                >
-                  {isEditing ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* CLOSE / ARCHIVE CONFIRMATION MODAL */}
-      {closingCase && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-lg border border-border w-full max-w-md shadow-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-full bg-amber-950/80 border border-amber-800 text-amber-400">
-                <Archive className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">
-                  {closingCase.status === "ACTIVE" ? "Close Investigation?" : "Reopen Investigation?"}
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">{closingCase.name}</p>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {closingCase.status === "ACTIVE"
-                ? "Closing this case marks it as inactive. All associated entities, graph relationships, financial transactions, and alerts will remain preserved and accessible."
-                : "Reopening this case will restore it to ACTIVE investigation status."}
-            </p>
-
-            <div className="pt-3 border-t border-border flex justify-end gap-3 text-xs">
-              <button
-                onClick={() => setClosingCase(null)}
-                className="px-4 py-2 rounded bg-surface-raised hover:bg-surface-hover border border-border text-slate-300"
+                className="
+                  px-4 py-2
+                  bg-transparent
+                  border border-[#2b2d31]
+                  hover:bg-[#161719]
+                  text-neutral-400
+                  hover:text-neutral-200
+                  text-xs
+                  font-medium
+                  rounded-md
+                  transition-colors
+                "
               >
                 Cancel
               </button>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="
+                  px-4 py-2
+                  bg-white
+                  hover:bg-neutral-200
+                  text-black
+                  text-xs
+                  font-medium
+                  rounded-md
+                  transition-colors
+                  disabled:opacity-50
+                "
+              >
+                {isSubmitting
+                  ? "Registering..."
+                  : "Create investigation"}
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    )}
+
+
+    {/* EDIT CASE MODAL*/}
+    {editingCase && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+
+        <div className="w-full max-w-xl bg-[#0d0e10] border border-[#2b2d31] rounded-md shadow-2xl">
+
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#222427]">
+
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.15em] text-neutral-400 mb-1">
+                NEXUS / CASE MANAGEMENT
+              </p>
+
+              <h3 className="text-base font-semibold text-neutral-100">
+                Edit investigation
+              </h3>
+            </div>
+
+            <button
+              onClick={() => setEditingCase(null)}
+              className="p-2 text-neutral-600 hover:text-neutral-200 hover:bg-[#161719] rounded-md transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+          </div>
+
+
+          {editError && (
+            <div className="mx-6 mt-5 px-3 py-2.5 bg-[#241214] border border-red-900/70 rounded-md text-red-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{editError}</span>
+            </div>
+          )}
+
+
+          <form
+            onSubmit={handleEditSubmit}
+            className="p-6 space-y-4"
+          >
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Case name
+                <span className="text-red-400 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                required
+                value={editForm.name}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    name: e.target.value,
+                  })
+                }
+                className="
+                  w-full px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  outline-none
+                  focus:border-neutral-400
+                  focus:ring-1
+                  focus:ring-white/10
+                "
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                FIR number
+                <span className="text-red-400 ml-1">*</span>
+              </label>
+
+              <input
+                type="text"
+                required
+                value={editForm.fir_number}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    fir_number: e.target.value,
+                  })
+                }
+                className="
+                  w-full px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  outline-none
+                  focus:border-neutral-400
+                  focus:ring-1
+                  focus:ring-white/10
+                "
+              />
+            </div>
+
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                  Police station
+                </label>
+
+                <input
+                  type="text"
+                  value={editForm.police_station}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      police_station: e.target.value,
+                    })
+                  }
+                  className="
+                    w-full px-3 py-2.5
+                    bg-[#080909]
+                    border border-[#292a2d]
+                    rounded-md
+                    text-sm text-neutral-200
+                    outline-none
+                    focus:border-neutral-400
+                  "
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                  Officer rank
+                </label>
+
+                <input
+                  type="text"
+                  value={editForm.officer_rank}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      officer_rank: e.target.value,
+                    })
+                  }
+                  className="
+                    w-full px-3 py-2.5
+                    bg-[#080909]
+                    border border-[#292a2d]
+                    rounded-md
+                    text-sm text-neutral-200
+                    outline-none
+                    focus:border-neutral-400
+                  "
+                />
+              </div>
+
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Investigating officer
+              </label>
+
+              <input
+                type="text"
+                value={editForm.investigating_officer}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    investigating_officer: e.target.value,
+                  })
+                }
+                className="
+                  w-full px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  outline-none
+                  focus:border-neutral-400
+                "
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Status
+              </label>
+
+              <select
+                value={editForm.status}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    status: e.target.value,
+                  })
+                }
+                className="
+                  w-full px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  outline-none
+                  focus:border-neutral-400
+                "
+              >
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="CLOSED">CLOSED</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-1.5">
+                Case description
+              </label>
+
+              <textarea
+                rows={4}
+                value={editForm.description}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    description: e.target.value,
+                  })
+                }
+                className="
+                  w-full px-3 py-2.5
+                  bg-[#080909]
+                  border border-[#292a2d]
+                  rounded-md
+                  text-sm text-neutral-200
+                  outline-none
+                  focus:border-neutral-400
+                  resize-none
+                "
+              />
+            </div>
+
+
+            <div className="flex justify-end gap-2 pt-4 border-t border-[#222427]">
+
+              <button
+                type="button"
+                onClick={() => setEditingCase(null)}
+                className="
+                  px-4 py-2
+                  border border-[#2b2d31]
+                  hover:bg-[#161719]
+                  text-neutral-400
+                  hover:text-neutral-200
+                  text-xs
+                  font-medium
+                  rounded-md
+                  transition-colors
+                "
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                disabled={isEditing}
+                className="
+                  px-4 py-2
+                  bg-white
+                  hover:bg-neutral-200
+                  text-black
+                  text-xs
+                  font-medium
+                  rounded-md
+                  transition-colors
+                  disabled:opacity-50
+                "
+              >
+                {isEditing ? "Saving..." : "Save changes"}
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    )}
+
+
+    {/* =========================================================
+        CLOSE / REOPEN CASE MODAL
+    ========================================================= */}
+    {closingCase && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+
+        <div className="w-full max-w-md bg-[#0d0e10] border border-[#2b2d31] rounded-md shadow-2xl">
+
+          <div className="p-6">
+
+            <div className="flex items-start gap-3">
+
+              <div className="w-9 h-9 flex items-center justify-center rounded-md bg-[#211a0c] border border-amber-900/60 shrink-0">
+                <Archive className="w-4 h-4 text-amber-400" />
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-neutral-100">
+                  {closingCase.status === "ACTIVE"
+                    ? "Close investigation?"
+                    : "Reopen investigation?"}
+                </h3>
+
+                <p className="text-xs text-neutral-500 mt-1">
+                  {closingCase.name}
+                </p>
+              </div>
+
+            </div>
+
+
+            <div className="mt-5 p-3 bg-[#111214] border border-[#292a2d] rounded-md">
+
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                {closingCase.status === "ACTIVE"
+                  ? "Closing this case marks it as inactive. All associated entities, graph relationships, financial transactions, and alerts will remain preserved and accessible."
+                  : "Reopening this case will restore it to ACTIVE investigation status."}
+              </p>
+
+            </div>
+
+
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-[#222427]">
+
+              <button
+                onClick={() => setClosingCase(null)}
+                className="
+                  px-4 py-2
+                  border border-[#2b2d31]
+                  hover:bg-[#161719]
+                  text-neutral-400
+                  hover:text-neutral-200
+                  text-xs
+                  font-medium
+                  rounded-md
+                  transition-colors
+                "
+              >
+                Cancel
+              </button>
+
               <button
                 onClick={handleToggleStatus}
                 disabled={isUpdatingStatus}
-                className="px-4 py-2 rounded bg-amber-600 hover:bg-amber-500 text-white font-semibold"
+                className="
+                  px-4 py-2
+                  bg-amber-600
+                  hover:bg-amber-500
+                  text-white
+                  text-xs
+                  font-medium
+                  rounded-md
+                  transition-colors
+                  disabled:opacity-50
+                "
               >
                 {isUpdatingStatus
                   ? "Updating..."
                   : closingCase.status === "ACTIVE"
-                  ? "Confirm Close"
-                  : "Confirm Reopen"}
+                  ? "Confirm close"
+                  : "Confirm reopen"}
               </button>
+
             </div>
+
           </div>
+
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+
+  </div>
+);
 }

@@ -39,13 +39,13 @@ export default function TimelinePage() {
   }, [activeCaseId]);
 
   return (
-    <div className="space-y-4 font-mono select-none">
-      <div className="p-4 rounded-lg bg-surface border border-border">
+    <div className="space-y-4 select-none">
+      <div className="p-4 rounded-lg bg-black border border-zinc-800">
         <h1 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <Clock className="w-4 h-4 text-nexus-400" />
+          <Clock className="w-4 h-4 text-zinc-300" />
           <span>Investigation Chronology & Event Timeline</span>
         </h1>
-        <p className="text-[11px] text-slate-400 mt-0.5">
+        <p className="text-[11px] text-zinc-400 mt-0.5">
           Chronologically correlated meetings, communication bursts, surveillance traces, and financial transfers.
         </p>
       </div>

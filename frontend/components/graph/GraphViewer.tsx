@@ -10,8 +10,7 @@ import {
   RotateCcw,
   Layers,
   Filter,
-  Route,
-  Search,
+  Route, Search,
   Users2,
   Info,
   SlidersHorizontal,
@@ -24,7 +23,7 @@ import { findShortestPath } from "@/lib/api/graph";
 if (typeof window !== "undefined") {
   try {
     cytoscape.use(coseBilkent);
-  } catch {}
+  } catch { }
 }
 
 interface GraphViewerProps {
@@ -49,7 +48,7 @@ export function GraphViewer({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>("ALL");
   const [minRiskFilter, setMinRiskFilter] = useState<number>(0);
-  
+
   // Shortest Path State
   const [showPathModal, setShowPathModal] = useState<boolean>(false);
   const [sourceNodeId, setSourceNodeId] = useState<string>("");
@@ -240,22 +239,22 @@ export function GraphViewer({
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
       {/* Top Floating Control Bar */}
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-surface/90 backdrop-blur border border-border rounded-lg p-1.5 shadow-xl">
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/90 backdrop-blur border border-zinc-800 rounded-lg p-1.5 shadow-xl">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Filter graph nodes..."
-            className="pl-8 pr-3 py-1.5 rounded bg-surface-raised border border-border focus:border-nexus-500 focus:outline-none text-xs font-mono text-white placeholder:text-slate-500 w-48 transition-all"
+            className="pl-8 pr-3 py-1.5 rounded bg-zinc-900 border border-zinc-800 focus:border-zinc-600 focus:outline-none text-xs text-white placeholder:text-zinc-500 w-48 transition-all"
           />
         </div>
 
         <select
           value={layoutName}
           onChange={(e) => setLayoutName(e.target.value)}
-          className="px-2.5 py-1.5 rounded bg-surface-raised border border-border text-xs font-mono text-slate-300 focus:outline-none"
+          className="px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 focus:outline-none"
         >
           <option value="cose">Force Layout (CoSE)</option>
           <option value="circle">Circle Layout</option>
@@ -265,10 +264,10 @@ export function GraphViewer({
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`p-1.5 rounded border text-xs font-mono flex items-center gap-1.5 transition-colors ${
+          className={`p-1.5 rounded border text-xs flex items-center gap-1.5 transition-colors ${
             showFilters
-              ? "bg-nexus-900/60 border-nexus-600 text-nexus-300"
-              : "bg-surface-raised border-border text-slate-300 hover:text-white"
+              ? "bg-zinc-900 border-zinc-600 text-white"
+              : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white"
           }`}
           title="Toggle Filters"
         >
@@ -278,43 +277,43 @@ export function GraphViewer({
 
         <button
           onClick={() => setShowPathModal(!showPathModal)}
-          className={`p-1.5 rounded border text-xs font-mono flex items-center gap-1.5 transition-colors ${
+          className={`p-1.5 rounded border text-xs flex items-center gap-1.5 transition-colors ${
             showPathModal
-              ? "bg-pink-950/80 border-pink-600 text-pink-300"
-              : "bg-surface-raised border-border text-slate-300 hover:text-white"
+              ? "bg-zinc-900 border-zinc-600 text-white"
+              : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white"
           }`}
           title="Trace Connection Path"
         >
-          <Route className="w-3.5 h-3.5 text-pink-400" />
+          <Route className="w-3.5 h-3.5 text-zinc-300" />
           <span>Shortest Path</span>
         </button>
       </div>
 
       {/* Floating Filter Drawer */}
       {showFilters && (
-        <div className="absolute top-16 left-4 z-10 w-72 bg-surface/95 backdrop-blur border border-border rounded-lg p-4 shadow-2xl space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-border/60">
-            <span className="text-xs font-mono font-semibold text-white">Graph Filters</span>
+        <div className="absolute top-16 left-4 z-10 w-72 bg-black/95 backdrop-blur border border-zinc-800 rounded-lg p-4 shadow-2xl space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+            <span className="text-xs font-semibold text-white">Graph Filters</span>
             <button
               onClick={() => {
                 setSelectedTypeFilter("ALL");
                 setMinRiskFilter(0);
                 setSearchTerm("");
               }}
-              className="text-[10px] text-nexus-400 hover:underline"
+              className="text-[10px] text-zinc-400 hover:text-white hover:underline"
             >
               Reset Filters
             </button>
           </div>
 
           <div>
-            <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
+            <label className="text-[10px] uppercase text-zinc-400 block mb-1">
               Entity Type
             </label>
             <select
               value={selectedTypeFilter}
               onChange={(e) => setSelectedTypeFilter(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded bg-surface-raised border border-border text-xs font-mono text-slate-200"
+              className="w-full px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-200"
             >
               <option value="ALL">All Entity Types</option>
               <option value="PERSON">Persons</option>
@@ -327,9 +326,9 @@ export function GraphViewer({
           </div>
 
           <div>
-            <div className="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
+            <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
               <span>Min Risk Score</span>
-              <span className="text-orange-400 font-bold">{minRiskFilter}/100</span>
+              <span className="text-zinc-200 font-bold">{minRiskFilter}/100</span>
             </div>
             <input
               type="range"
@@ -338,7 +337,7 @@ export function GraphViewer({
               step="5"
               value={minRiskFilter}
               onChange={(e) => setMinRiskFilter(Number(e.target.value))}
-              className="w-full accent-nexus-500 cursor-pointer"
+              className="w-full accent-white cursor-pointer"
             />
           </div>
         </div>
@@ -346,15 +345,15 @@ export function GraphViewer({
 
       {/* Shortest Path Modal */}
       {showPathModal && (
-        <div className="absolute top-16 left-4 z-10 w-84 max-w-md bg-surface/95 backdrop-blur border border-pink-900/60 rounded-lg p-4 shadow-2xl space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-border/60">
-            <div className="flex items-center gap-1.5 text-xs font-mono font-semibold text-pink-300">
+        <div className="absolute top-16 left-4 z-10 w-84 max-w-md bg-black/95 backdrop-blur border border-zinc-800 rounded-lg p-4 shadow-2xl space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200">
               <Route className="w-4 h-4" />
               <span>Trace Intermediary Connection</span>
             </div>
             <button
               onClick={() => setShowPathModal(false)}
-              className="text-xs text-slate-400 hover:text-white"
+              className="text-xs text-zinc-400 hover:text-white"
             >
               ✕
             </button>
@@ -362,11 +361,11 @@ export function GraphViewer({
 
           <div className="space-y-2">
             <div>
-              <label className="text-[10px] font-mono uppercase text-slate-400">Entity A (Source)</label>
+              <label className="text-[10px] uppercase text-zinc-400">Entity A (Source)</label>
               <select
                 value={sourceNodeId}
                 onChange={(e) => setSourceNodeId(e.target.value)}
-                className="w-full mt-1 px-2.5 py-1.5 rounded bg-surface-raised border border-border text-xs font-mono text-slate-200"
+                className="w-full mt-1 px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-200"
               >
                 <option value="">Select Starting Entity...</option>
                 {data.nodes.map((n) => (
@@ -378,11 +377,11 @@ export function GraphViewer({
             </div>
 
             <div>
-              <label className="text-[10px] font-mono uppercase text-slate-400">Entity B (Target)</label>
+              <label className="text-[10px] uppercase text-zinc-400">Entity B (Target)</label>
               <select
                 value={targetNodeId}
                 onChange={(e) => setTargetNodeId(e.target.value)}
-                className="w-full mt-1 px-2.5 py-1.5 rounded bg-surface-raised border border-border text-xs font-mono text-slate-200"
+                className="w-full mt-1 px-2.5 py-1.5 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-200"
               >
                 <option value="">Select Target Entity...</option>
                 {data.nodes.map((n) => (
@@ -396,20 +395,20 @@ export function GraphViewer({
             <button
               disabled={!sourceNodeId || !targetNodeId || isCalculatingPath}
               onClick={handleShortestPath}
-              className="w-full mt-2 py-2 rounded bg-pink-700 hover:bg-pink-600 disabled:opacity-50 text-xs font-mono font-medium text-white transition-colors"
+              className="w-full mt-2 py-2 rounded bg-white hover:bg-zinc-200 disabled:opacity-50 text-xs font-semibold text-black transition-colors"
             >
               {isCalculatingPath ? "Calculating Shortest Path..." : "Find Connection Path"}
             </button>
           </div>
 
           {pathResult && (
-            <div className="mt-3 p-3 rounded bg-surface-raised/70 border border-border text-xs font-mono space-y-2">
+            <div className="mt-3 p-3 rounded bg-zinc-900 border border-zinc-800 text-xs space-y-2">
               <div className="flex items-center justify-between font-semibold">
-                <span className={pathResult.found ? "text-emerald-400" : "text-amber-400"}>
+                <span className={pathResult.found ? "text-white" : "text-zinc-400"}>
                   {pathResult.found ? `Path Found (${pathResult.path_length} Hops)` : "No Direct Path"}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 whitespace-pre-line leading-relaxed">
+              <p className="text-[11px] text-zinc-300 whitespace-pre-line leading-relaxed">
                 {pathResult.explanation}
               </p>
             </div>
@@ -418,31 +417,31 @@ export function GraphViewer({
       )}
 
       {/* Floating Canvas Navigation Controls */}
-      <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-1.5 bg-surface/90 backdrop-blur border border-border rounded-lg p-1.5 shadow-xl">
+      <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-1.5 bg-black/90 backdrop-blur border border-zinc-800 rounded-lg p-1.5 shadow-xl">
         <button
           onClick={handleZoomIn}
-          className="p-2 rounded bg-surface-raised hover:bg-surface-hover text-slate-300 hover:text-white transition-colors"
+          className="p-2 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
           title="Zoom In"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
         <button
           onClick={handleZoomOut}
-          className="p-2 rounded bg-surface-raised hover:bg-surface-hover text-slate-300 hover:text-white transition-colors"
+          className="p-2 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
           title="Zoom Out"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
         <button
           onClick={handleFit}
-          className="p-2 rounded bg-surface-raised hover:bg-surface-hover text-slate-300 hover:text-white transition-colors"
+          className="p-2 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
           title="Fit Graph"
         >
           <Maximize2 className="w-4 h-4" />
         </button>
         <button
           onClick={handleReset}
-          className="p-2 rounded bg-surface-raised hover:bg-surface-hover text-slate-300 hover:text-white transition-colors"
+          className="p-2 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
           title="Reset Graph & Highlights"
         >
           <RotateCcw className="w-4 h-4" />
@@ -451,17 +450,17 @@ export function GraphViewer({
 
       {/* Interactive Legend Bar */}
       {showLegend && (
-        <div className="absolute bottom-6 left-6 z-10 bg-surface/90 backdrop-blur border border-border rounded-lg p-3 shadow-xl max-w-sm">
-          <div className="flex items-center justify-between pb-1.5 border-b border-border/50 text-[11px] font-mono text-slate-300">
+        <div className="absolute bottom-6 left-6 z-10 bg-black/90 backdrop-blur border border-zinc-800 rounded-lg p-3 shadow-xl max-w-sm">
+          <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800 text-[11px] text-zinc-300">
             <span className="font-semibold">Topology Legend</span>
             <button
               onClick={() => setShowLegend(false)}
-              className="text-slate-500 hover:text-slate-300 text-[10px]"
+              className="text-zinc-500 hover:text-zinc-300 text-[10px]"
             >
               Hide
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-2 text-[10px] font-mono text-slate-300">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-2 text-[10px] text-zinc-300">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-blue-600 border border-blue-400" />
               <span>Person (Circle)</span>
